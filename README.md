@@ -30,50 +30,53 @@
 - **Custom Markdown Renderer:** The integrated file viewer uses `react-markdown` with explicit custom secure protocols (`gitbot-repo://` and `gitbot-profile://`) registered in Electron to seamlessly bypass CSP restrictions and render local project images inside your Markdown.
 - **Animated Startup Details:** Features an introductory animated screen (with global toggle) and a persistent state layout mimicking high-end developer IDEs.
 
-### Plan mode work 
 
 | 1 | 2 | 3 | 4 | 5 |
 |:---:|:---:|:---:|:---:|:---:|
 | ![ai_panel](assets/ai_panel.png) | ![ai_plan_creat_auto](assets/ai_plan_creat_auto.png) | ![ai_plan_in_Repositor](assets/ai_plan_in_Repositor.png) | ![ai_plan_mode](assets/ai_plan_mode.png) | ![ai_plan_select](assets/ai_plan_select.png) |
 
-### Settinges
+| 1 | 2 | 3 | 4 | 
+|:---:|:---:|:---:|:---:|
+| ![system_prompt](assets/system_prompt.png) | ![Repositories_download](assets/Repositories_download.png) | ![profile_settinges](assets/profile_settinges.png) | ![themes](assets/themes.png) | |
 
-<div align='center'>
+| 1 | 2 | 3 | 4 | 
+|:---:|:---:|:---:|:---:|
+| ![system_prompt](assets/system_prompt.png) | ![Repositories_download](assets/Repositories_download.png) | ![profile_settinges](assets/profile_settinges.png) | ![themes](assets/themes.png) | |
 
-<img src='assets/system_prompt.png' width='32%' style='margin:5px;' />
-<img src='assets/Repositories_download.png' width='32%' style='margin:5px;' />
-<img src='assets/profile_settinges.png' width='32%' style='margin:5px;' />
-<img src='assets/themes.png' width='32%' style='margin:5px;' />
-
-</div>
-
-### AI Panel
-
-| Simple ai | Diagram mod |
-|---|---|
-| ![ai_panel](assets/ai_panel.png) | ![diagram_ai](assets/diagram_ai.png) |
+| 1 | 2 | 3 | 4 |
+|:---:|:---:|:---:|:---:|
+| ![ai_panel](assets/ai_panel.png) | ![diagram_ai](assets/diagram_ai.png) | ![Repository](assets/Repository.png) | ![ai_plan_creat_auto](assets/ai_plan_creat_auto.png) | |
 
 
-### GitBot
+| 1 | 2 | 3 | 4 | 
+|:---:|:---:|:---:|:---:|
+| ![themes](assets/themes.png) | ![csv_mode](assets/csv_mode.png) | ![hrml_mode](assets/hrml_mode.png) | ![readme_mode](assets/readme_mode.png) | |
 
 
-<div align='center'>
-
-
-<img src='assets/Repository.png' width='50%' style='margin:5px;' />
-<img src='assets/ai_plan_creat_auto.png' width='50%' style='margin:5px;' />
-
-</div>
-
-### More :
-
-
-| Image | Image |
-|---|---|
-| ![themes](assets/themes.png) | ![csv_mode](assets/csv_mode.png) |
-| ![hrml_mode](assets/hrml_mode.png) | ![readme_mode](assets/readme_mode.png) |
-
----
+<div class="container">
+                <div class="title-block">
+                    <h2 data-i18n="cmd_title">Shortcuts &amp; CLI</h2>
+                </div>
+                <div class="cmd-split">
+                    <div class="cmd-card">
+                        <h3 data-i18n="cmd_hotkeys">Hotkeys</h3>
+                        <ul class="key-list">
+                            <li><kbd>F9</kbd> <span data-i18n="key_toggle">Toggle Visibility</span></li>
+                            <li><kbd>Ctrl + R</kbd> <span data-i18n="key_reload">Force Reload</span></li>
+                            <li><kbd>Ctrl + F</kbd> <span data-i18n="key_search">Smart Search</span></li>
+                        </ul>
+                    </div>
+                    <div class="cmd-card">
+                        <h3 data-i18n="cmd_cli">gbot CLI</h3>
+                        <ul class="cli-list">
+                            <li><code>gbot commit</code> — <span data-i18n="cli_commit">Quick Snapshot</span></li>
+                            <li><code>gbot status</code> — <span data-i18n="cli_status">Diff View</span></li>
+                            <li><code>/plan</code> — <span data-i18n="cli_plan">AI Scaffolding</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
 
 ## Technical Architecture
 
