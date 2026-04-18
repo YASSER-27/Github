@@ -12,8 +12,8 @@
 <p align="center">
   <a href="#english-version">English Version</a> • <a href="#النسخة-العربية">النسخة العربية</a>
 </p>
+<p align="center">Experience the power of GitHub, locally. No cloud, no limits—just you and your coder</p>
 
----
 
 <h2 id="english-version">English Version</h2>
 
