@@ -19,7 +19,20 @@
 
 > Welcome to **Gitbot**, a professional, fully offline, and highly secure Desktop application built with **Electron + React + Vite**. Gitbot is designed as your intelligent AI copilot and version control hub, managing your code repositories and giving you instant AI insights entirely on your local machine.
 
-[Download Gitbot windows](https://github.com/YASSER-27/Github/releases/download/v1/Gitbot.exe)
+>  Gitbot v1.1.1 — Security, Performance & Theming Update
+This release focuses on hardening the application for production use, improving system resource management, and expanding the visual customization options available to users.
+# Security Hardening
+> The Electron backend is now compiled through a dedicated obfuscation pass using javascript-obfuscator, making the distributed binary resistant to source extraction. A strict Content-Security-Policy has been enforced at the document level, blocking any injected scripts that may originate from untrusted markdown content inside repositories. In production builds, the developer tools and default system application menus are completely disabled.
+# Resource Management & Stability
+> The AI server process (llama-server) now terminates forcefully and immediately when the application exits, using a taskkill /F call that ensures all locked DLL resources are released. This prevents build failures caused by file locks from a previous session. The application also correctly displays its tray icon after packaging by relocating the assets directory to extraResources, placing them outside the ASAR archive where the file system can resolve them at runtime.
+# Auto-Connect Model Memory
+> The last successfully loaded AI model path is now persisted in the application's configuration file. On the next launch, Gitbot reads this path and starts the AI engine automatically, eliminating the need to re-select the model each session.
+# New Themes
+> Four new animated dark themes have been added to the existing palette, all sharing a warm, gold-toned aesthetic: Amber Gold, Obsidian Gold, Sunset, and Desert. Each uses layered radial gradients animated in the background to give the interface a living, premium feel.
+# Documentation
+> The README has been fully restructured with a bilingual layout — English and Arabic — connected via quick-jump navigation anchors. A themes reference table, a security section, and an updated build guide are now included.
+
+[Download Gitbot windows](https://github.com/YASSER-27/Github/releases/download/v1.1.1/Gitbot.Setup.1.1.1.exe)
 
 ## Key Features
 
@@ -100,7 +113,6 @@
                 </div>
             </div>
             
-
 ## Technical Architecture
 
 - **Frontend:** React + Vite, fully statically typed with TypeScript. Uses `lucide-react` for beautiful vector icons.
@@ -139,7 +151,7 @@ Built with precision for uncompromised local AI productivity.
 
 > مرحبًا بك في **Gitbot**، تطبيق سطح مكتب احترافي، يعمل بالكامل دون الحاجة للإنترنت، وهو محمي ومؤمن بشدة بفضل برمجته عبر **Electron + React + Vite**. تم تصميم Gitbot ليكون المساعد الذكي لإدارة شفراتك ومستودعاتك البرمجية وتوفير ميزة الذكاء الاصطناعي على جهازك المحلي فقط.
 
-[تحميل تطبيق Gitbot للويندوز](https://github.com/YASSER-27/Github/releases/download/v1/Gitbot.exe)
+[تحميل تطبيق Gitbot للويندوز](https://github.com/YASSER-27/Github/releases/download/v1.1.1/Gitbot.Setup.1.1.1.exe)
 
 ## الميزات الرئيسية
 
