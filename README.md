@@ -31,9 +31,10 @@
 - **Animated Startup Details:** Features an introductory animated screen (with global toggle) and a persistent state layout mimicking high-end developer IDEs.
 
 ### Plan mode work 
-|  1 |  2 | 3 |  4 |  5 |
-|-------|-------|-------|-------|
-| ![ai_panel](assets/ai_panel.png)  | ![ai_plan_creat_auto](assets/ai_plan_creat_auto.png)  | ![ai_plan_in_Repositor](assets/ai_plan_in_Repositor.png)  | ![ai_plan_mode](assets/ai_plan_mode.png) | ![ai_plan_select](assets/ai_plan_select.png) |
+
+| 1 | 2 | 3 | 4 | 5 |
+|:---:|:---:|:---:|:---:|:---:|
+| ![ai_panel](assets/ai_panel.png) | ![ai_plan_creat_auto](assets/ai_plan_creat_auto.png) | ![ai_plan_in_Repositor](assets/ai_plan_in_Repositor.png) | ![ai_plan_mode](assets/ai_plan_mode.png) | ![ai_plan_select](assets/ai_plan_select.png) |
 
 ### Settinges
 
