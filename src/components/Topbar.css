@@ -1,0 +1,188 @@
+/* ── Topbar ── */
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 48px;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  gap: 0;
+  z-index: 1000;
+  flex-shrink: 0;
+  overflow: visible;
+  /* NO drag on topbar itself — we use a dedicated drag handle */
+  user-select: none;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+/* Invisible drag handle that fills the middle space */
+.topbar-drag {
+  flex: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+  cursor: default;
+  min-width: 40px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+/* Logo */
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.9;
+  transition: opacity 0.15s;
+  -webkit-app-region: no-drag;
+}
+.topbar-logo:hover { opacity: 1; text-decoration: none; }
+.topbar-logo img { width: 26px; height: 26px; border-radius: 4px; }
+
+/* Search */
+.topbar-search {
+  position: relative;
+  max-width: 200px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+.topbar-search input {
+  width: 100%; padding: 4px 12px; font-size: 13px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 6px; color: var(--text-secondary);
+  outline: none; font-family: inherit; transition: all 0.2s;
+}
+.topbar-search input:focus {
+  background: var(--bg-color);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(47,129,247,0.2);
+}
+.topbar-search input::placeholder { color: #484f58; }
+
+/* Nav */
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  -webkit-app-region: no-drag;
+}
+.topbar-nav a {
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 500;
+  padding: 5px 10px; border-radius: 6px;
+  text-decoration: none; transition: background 0.15s, color 0.15s;
+}
+.topbar-nav a:hover { background: rgba(255,255,255,0.07); color: var(--text-primary); text-decoration: none; }
+.topbar-nav a.active { color: var(--text-primary); font-weight: 600; }
+
+/* Buttons */
+.topbar-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  height: 30px; padding: 0 8px; gap: 4px;
+  border-radius: 6px; background: transparent; border: none;
+  color: var(--text-secondary); cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-app-region: no-drag;
+}
+.topbar-icon-btn:hover { background: rgba(255,255,255,0.07); color: var(--text-primary); }
+.topbar-plus-btn { gap: 2px; }
+
+/* Avatar */
+.topbar-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  cursor: pointer; display: block;
+  transition: border-color 0.15s;
+  object-fit: cover;
+  -webkit-app-region: no-drag;
+}
+.topbar-avatar:hover { border-color: var(--accent-color); }
+
+/* Dropdown */
+.topbar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  overflow: hidden;
+  animation: dropIn 0.15s ease-out;
+  z-index: 200;
+  -webkit-app-region: no-drag;
+}
+.topbar-dropdown-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; font-size: 13px;
+  color: var(--text-primary); cursor: pointer;
+  transition: background 0.1s;
+}
+.topbar-dropdown-item:hover { background: rgba(255,255,255,0.07); }
+
+/* Window controls */
+.win-controls {
+  display: flex; align-items: center;
+  margin-left: 8px; gap: 0;
+  border-left: 1px solid var(--border-color);
+  padding-left: 8px;
+  -webkit-app-region: no-drag;
+}
+.win-btn {
+  width: 36px; height: 30px; border: none;
+  background: transparent; color: var(--text-secondary);
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+  -webkit-app-region: no-drag;
+}
+.win-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+.win-close:hover { background: #c0392b; color: #fff; }
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Upload progress list in modal */
+.upload-progress-list {
+  max-height: 220px; overflow-y: auto;
+  margin-top: 16px;
+  border: 1px solid var(--border-color); border-radius: 6px;
+}
+
+/* ── AI Streaming indicator dot ── */
+.topbar-ai-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  border: 2px solid var(--header-bg);
+  animation: aiPulse 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes aiPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.6; }
+}

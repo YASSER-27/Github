@@ -1,0 +1,103 @@
+.templates-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  width: 100%;
+}
+
+.templates-container .setting-card {
+  position: relative;
+  width: 300px;
+  height: 200px;
+}
+
+.templates-container .setting-card .face {
+  width: 300px;
+  height: 200px;
+  transition: 0.4s;
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: 12px;
+}
+
+.templates-container .setting-card .face.face1 {
+  background: var(--bg-tertiary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  transform: translateY(0);
+}
+
+.templates-container .setting-card:hover .face.face1 {
+  transform: translateY(-80px);
+  box-shadow:
+    inset 0 0 60px rgba(255,255,255,0.05),
+    inset 20px 0 80px rgba(255,0,255,0.2),
+    inset -20px 0 80px rgba(0,255,255,0.2),
+    0 0 30px rgba(255,255,255,0.1);
+}
+
+.templates-container .setting-card .face.face1 .content {
+  opacity: 0.5;
+  transition: 0.5s;
+  text-align: center;
+}
+
+.templates-container .setting-card:hover .face.face1 .content {
+  opacity: 1;
+}
+
+.templates-container .setting-card .face.face1 .content svg {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.templates-container .setting-card .face.face1 .content h3 {
+  font-size: 1.2em;
+  color: white;
+  margin: 0;
+}
+
+.templates-container .setting-card .face.face2 {
+  background: whitesmoke;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transform: translateY(0);
+  z-index: 0;
+  opacity: 0;
+}
+
+.templates-container .setting-card:hover .face.face2 {
+  transform: translateY(80px);
+  opacity: 1;
+}
+
+.templates-container .setting-card .face.face2 .content p {
+  font-size: 13px;
+  margin: 0 0 15px 0;
+  padding: 0;
+  color: #333;
+}
+
+.templates-container .setting-card .face.face2 .content button {
+  text-decoration: none;
+  background: transparent;
+  color: #333;
+  border: 1px dashed #333;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.templates-container .setting-card .face.face2 .content button:hover {
+  background: #333;
+  color: whitesmoke;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);
+}
