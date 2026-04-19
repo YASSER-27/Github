@@ -21,6 +21,12 @@
 
 >  Gitbot v1.1.1 — Security, Performance & Theming Update
 This release focuses on hardening the application for production use, improving system resource management, and expanding the visual customization options available to users.
+
+ `Gitbot`
+
+<img src="Pack/overview.jpg" alt="27 in space" width="960">
+
+
 # Security Hardening
 > The Electron backend is now compiled through a dedicated obfuscation pass using javascript-obfuscator, making the distributed binary resistant to source extraction. A strict Content-Security-Policy has been enforced at the document level, blocking any injected scripts that may originate from untrusted markdown content inside repositories. In production builds, the developer tools and default system application menus are completely disabled.
 # Resource Management & Stability
@@ -48,6 +54,10 @@ This release focuses on hardening the application for production use, improving 
 - **Snapshot (Commit) System:** Save the state of your project by making a "Commit". Gitbot packages the entire state into a secure `.zip` file stored safely in the project's background `commits` folder. Revert or inspect previous states instantly.
 - **Releases:** Export and compile finished projects as versions (e.g., v1.0.0) ready for deployment.
 
+`settings`
+
+<img src="Pack/settings.jpg" alt="27 in space" width="960">
+
 ### 3. State-of-the-art UI / UX
 - **Dynamic Theming Ecosystem:** A highly optimized css-variable engine allowing rapid, real-time transitions between an extensive palette of beautifully crafted environments. Available layout selections feature:
 
@@ -67,26 +77,11 @@ This release focuses on hardening the application for production use, improving 
 - **UI Lockdown:** Native Electron developer tools (F12) and system application menus are strictly disabled on deployment to prevent reverse engineering.
 - **Cross-Site Scripting (XSS) Policy:** Hardened Content-Security-Policy (CSP) headers block malicious payload execution when rendering insecure markdown documents.
 
-| 1 | 2 | 3 | 4 | 5 |
-|:---:|:---:|:---:|:---:|:---:|
-| ![ai_panel](assets/ai_panel.png) | ![ai_plan_creat_auto](assets/ai_plan_creat_auto.png) | ![ai_plan_in_Repositor](assets/ai_plan_in_Repositor.png) | ![ai_plan_mode](assets/ai_plan_mode.png) | ![ai_plan_select](assets/ai_plan_select.png) |
+## /diagram
 
-| 1 | 2 | 3 | 4 | 
-|:---:|:---:|:---:|:---:|
-| ![system_prompt](assets/system_prompt.png) | ![Repositories_download](assets/Repositories_download.png) | ![profile_settinges](assets/profile_settinges.png) | ![themes](assets/themes.png) | |
+> **Ask `/diagram` to visualize anything you imagine.** >
 
-| 1 | 2 | 3 | 4 | 
-|:---:|:---:|:---:|:---:|
-| ![system_prompt](assets/system_prompt.png) | ![Repositories_download](assets/Repositories_download.png) | ![profile_settinges](assets/profile_settinges.png) | ![themes](assets/themes.png) | |
-
-| 1 | 2 | 3 | 4 |
-|:---:|:---:|:---:|:---:|
-| ![ai_panel](assets/ai_panel.png) | ![diagram_ai](assets/diagram_ai.png) | ![Repository](assets/Repository.png) | ![ai_plan_creat_auto](assets/ai_plan_creat_auto.png) | |
-
-
-| 1 | 2 | 3 | 4 | 
-|:---:|:---:|:---:|:---:|
-| ![themes](assets/themes.png) | ![csv_mode](assets/csv_mode.png) | ![hrml_mode](assets/hrml_mode.png) | ![readme_mode](assets/readme_mode.png) | |
+<img src="Pack/diagram mode.jpg" alt="27 in space" width="960">
 
 
 <div class="container">
@@ -121,6 +116,12 @@ This release focuses on hardening the application for production use, improving 
   - Spawning the background AI processes with configured multithreading (`--ctx-size 8192`, `--parallel 1`, etc.).
   - Bypassing standard secure web contexts via `protocol.registerSchemesAsPrivileged` to map system folder paths perfectly.
 - **AI Connectivity:** Communicates with the AI via a fetch API wrapper (`AIContext.tsx`) that intercepts streaming chunks and processes them flawlessly even if the AI randomly cuts out. A heavily optimized Fallback JSON parser reliably rebuilds interrupted AI generation streams.
+
+## /plan 
+
+> **Ask `/plan`for creat full project auto
+
+<img src="Pack/plan mod.jpg" alt="27 in space" width="960">
 
 ## How to run locally
 
