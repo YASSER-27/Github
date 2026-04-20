@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Code, Settings, Folder, File, Upload, Menu, ChevronRight,
-  Download, X, GitCommit, Check, Loader, ExternalLink, Tag, Trash2, Edit3
+  Download, X, GitCommit, Check, Loader, ExternalLink, Tag, Trash2, Edit3, Terminal, Save, Copy, Play
 } from 'lucide-react';
 import Markdown from '../components/Markdown';
 import './Repository.css';
@@ -18,6 +18,7 @@ const LANG_COLORS: Record<string, string> = {
 };
 
 const OPENABLE_EXTS = ['.js', '.jsx', '.ts', '.tsx', '.py', '.html', '.css', '.scss', '.json', '.md', '.go', '.cpp', '.c', '.rs', '.java', '.rb', '.sh', '.txt', '.csv', '.xml', '.yaml', '.yml'];
+const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico'];
 
 export default function Repository() {
   const { name } = useParams<{ name: string }>();
@@ -28,9 +29,14 @@ export default function Repository() {
   const [currentPath, setCurrentPath] = useState('');
   const [langStats, setLangStats] = useState<Record<string, { size: number; files: string[] }>>({});
   const [filteredLang, setFilteredLang] = useState<string | null>(null);
-
-  // File viewer
+  
+  // File viewer & Editor
   const [viewingFile, setViewingFile] = useState<{ name: string; content: string; path: string } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [editBuffer, setEditBuffer] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Upload animation
   const [uploadingFiles, setUploadingFiles] = useState<{ name: string; done: boolean }[]>([]);
@@ -47,6 +53,14 @@ export default function Repository() {
   // Rename
   const [newRepoName, setNewRepoName] = useState(name || '');
   const [renameError, setRenameError] = useState('');
+
+  // About
+  const [about, setAbout] = useState('');
+  const [editingAbout, setEditingAbout] = useState(false);
+  const [aboutDraft, setAboutDraft] = useState('');
+  
+  // Profile
+  const [profile, setProfile] = useState<{ name: string; image: string }>({ name: 'GitbotUser', image: '' });
 
   const api = (window as any).api;
 
@@ -82,6 +96,24 @@ export default function Repository() {
     setReleases(r || []);
   };
 
+  const loadAbout = async () => {
+    if (!api || !name) return;
+    const txt = await api.getRepoAbout?.(name);
+    setAbout(txt || '');
+    setAboutDraft(txt || '');
+  };
+
+  const loadProfile = async () => {
+    if (!api) return;
+    const settings = await api.getSettings();
+    if (settings) {
+      setProfile({
+        name: settings.profileName || 'GitbotUser',
+        image: settings.profileImage || ''
+      });
+    }
+  };
+
   useEffect(() => {
     setCurrentPath('');
     setFilteredLang(null);
@@ -89,6 +121,8 @@ export default function Repository() {
     loadFiles('');
     loadReadme();
     loadLangStats();
+    loadAbout();
+    loadProfile();
   }, [name]);
 
   useEffect(() => {
@@ -105,12 +139,47 @@ export default function Repository() {
   const handleFileClick = async (filePath: string, fileName: string) => {
     if (!api || !name) return;
     const isTextFile = OPENABLE_EXTS.some(ext => fileName.toLowerCase().endsWith(ext)) || !fileName.includes('.');
-    if (!isTextFile) {
-      alert(`Cannot open ${fileName}. Only text-based files are supported in the preview UI.`);
+    const isImage = IMAGE_EXTS.some(ext => fileName.toLowerCase().endsWith(ext));
+
+    if (!isTextFile && !isImage) {
+      alert(`Cannot open ${fileName}. Only text-based files and images are supported in the preview UI.`);
       return;
     }
+
+    if (isImage) {
+      setViewingFile({ name: fileName, content: 'IMAGE_MODAL', path: filePath });
+      return;
+    }
+
     const content = await api.getFileContent(name, filePath);
-    if (content !== null) setViewingFile({ name: fileName, content, path: filePath });
+    if (content !== null) {
+      setViewingFile({ name: fileName, content, path: filePath });
+      setIsEditing(false);
+      setEditBuffer(content);
+    }
+  };
+
+  const handleCopyFile = () => {
+    if (!viewingFile) return;
+    const content = isEditing ? editBuffer : viewingFile.content;
+    navigator.clipboard.writeText(content);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const handleSaveFile = async () => {
+    if (!api || !name || !viewingFile || !isEditing) return;
+    setIsSaving(true);
+    const ok = await api.saveFileContent(name, viewingFile.path, editBuffer);
+    setIsSaving(false);
+    if (ok) {
+      setViewingFile({ ...viewingFile, content: editBuffer });
+      setIsEditing(false);
+      // Reload files to reflect size changes if needed
+      loadFiles(currentPath);
+    } else {
+      alert('Failed to save file.');
+    }
   };
 
   const handleOpenFile = async (filePath: string) => {
@@ -195,7 +264,7 @@ export default function Repository() {
         <div className="container">
           <div className="repo-title-row">
             <RepoIcon />
-            <Link to="/profile" className="user-link">GitbotUser</Link>
+            <Link to="/profile" className="user-link">{profile.name}</Link>
             <span className="separator">/</span>
             <span className="repo-name-text">{name}</span>
             <span className="badge">Public</span>
@@ -214,27 +283,103 @@ export default function Repository() {
       <div className="container repo-layout">
         {/* File Viewer Modal */}
         {viewingFile && (
-          <div className="topbar-modal-overlay fade-in" style={{ zIndex: 1000 }} onClick={() => setViewingFile(null)}>
-            <div className="topbar-modal" style={{ width: '80%', height: '85vh', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <File size={16} /> {viewingFile.name}
-                </h3>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button className="button" onClick={() => handleOpenFile(viewingFile.path)}>
-                    <ExternalLink size={14} /> Open Native
+          <div className="modal-backdrop fade-in" style={{ zIndex: 1000 }} onClick={() => setViewingFile(null)}>
+            <div className="file-modal" onClick={e => e.stopPropagation()}>
+              <div className="file-modal-header">
+                <div className="file-modal-title">
+                  <File size={15} />
+                  <span className="file-name-scroll">{viewingFile.name}</span>
+                </div>
+                <div className="file-modal-actions">
+                  <button className="button" style={{ fontSize: '12px' }} onClick={handleCopyFile}>
+                    <Copy size={13} /> {copySuccess ? 'Copied!' : 'Copy'}
                   </button>
-                  <button className="topbar-icon-btn" onClick={() => setViewingFile(null)}>
-                    <X size={16} />
+                  
+                  {viewingFile.content !== 'IMAGE_MODAL' && (
+                    <>
+                      {viewingFile.name.toLowerCase().endsWith('.html') && (
+                        <button className="button button-primary" style={{ fontSize: '12px', background: 'var(--green)', borderColor: 'var(--green)' }} onClick={() => setIsPreviewing(true)}>
+                          <Play size={13} /> Run
+                        </button>
+                      )}
+                      {isEditing ? (
+                        <button className="button button-primary" style={{ fontSize: '12px' }} onClick={handleSaveFile} disabled={isSaving}>
+                          {isSaving ? <Loader size={13} className="ai-spin" /> : <Save size={13} />} Save
+                        </button>
+                      ) : (
+                        <button className="button" style={{ fontSize: '12px' }} onClick={() => setIsEditing(true)}>
+                          <Edit3 size={13} /> Edit
+                        </button>
+                      )}
+                    </>
+                  )}
+
+                  <button className="button" style={{ fontSize: '12px' }}
+                    onClick={() => handleOpenFile(viewingFile.path)}>
+                    <ExternalLink size={13} /> Open native
                   </button>
+                  <button className="topbar-icon-btn" onClick={() => setViewingFile(null)}><X size={16} /></button>
                 </div>
               </div>
-              <textarea 
-                className="input" 
-                readOnly 
-                value={viewingFile.content} 
-                style={{ flex: 1, resize: 'none', fontFamily: 'monospace', fontSize: '13px', lineHeight: '1.5', whiteSpace: 'pre', padding: '16px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-              />
+
+              <div className="file-modal-body">
+                {viewingFile.content === 'IMAGE_MODAL' ? (
+                  <div className="image-viewer-container">
+                    <img
+                      src={`gitbot-repo://local/${encodeURIComponent(name!)}/${viewingFile.path}`}
+                      alt={viewingFile.name}
+                      className="viewer-img"
+                    />
+                  </div>
+                ) : isEditing ? (
+                  <textarea
+                    className="file-editor-textarea"
+                    value={editBuffer}
+                    onChange={e => setEditBuffer(e.target.value)}
+                    spellCheck={false}
+                    autoFocus
+                  />
+                ) : (
+                  <Markdown content={`\`\`\`${viewingFile.name.split('.').pop() || 'txt'}\n${viewingFile.content}\n\`\`\``} />
+                )}
+              </div>
+              {isEditing && (
+                 <div className="file-modal-footer">
+                   <span className="editor-hint">Editing mode enabled. Press Save twice if changes don't reflect immediately.</span>
+                   <button className="button" style={{ fontSize: '12px' }} onClick={() => { setIsEditing(false); setEditBuffer(viewingFile.content); }}>Cancel</button>
+                 </div>
+              )}
+             </div>
+            </div>
+        )}
+
+        {/* Live Preview Modal */}
+        {isPreviewing && viewingFile && (
+          <div className="modal-backdrop fade-in" style={{ zIndex: 1100 }} onClick={() => setIsPreviewing(false)}>
+            <div className="preview-modal" onClick={e => e.stopPropagation()}>
+              <div className="file-modal-header">
+                <div className="file-modal-title">
+                  <Play size={15} color="var(--green)" />
+                  <span className="file-name-scroll">Live Preview: {viewingFile.name}</span>
+                </div>
+                <div className="file-modal-actions">
+                  <button className="button" style={{ fontSize: '12px' }} onClick={() => {
+                     // Reload iframe by updating src with a timestamp or just re-setting it
+                     const ifr = document.getElementById('preview-iframe') as HTMLIFrameElement;
+                     if (ifr) ifr.src = ifr.src;
+                  }}>Reload</button>
+                  <button className="topbar-icon-btn" onClick={() => setIsPreviewing(false)}><X size={16} /></button>
+                </div>
+              </div>
+              <div className="preview-modal-body">
+                <iframe
+                  id="preview-iframe"
+                  src={`gitbot-repo://local/${encodeURIComponent(name!)}/${viewingFile.path}`}
+                  title="Gitbot Live Preview"
+                  className="preview-iframe"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -269,6 +414,9 @@ export default function Repository() {
                   )}
                 </div>
                 <div className="repo-actions">
+                  <button className="button" title="Open in PowerShell" onClick={() => api?.openInPowershell?.(name!)}>
+                    <Terminal size={14} /> Shell
+                  </button>
                   <button className="button" onClick={handleUpload}>
                     <Upload size={14} /> Upload
                   </button>
@@ -299,9 +447,9 @@ export default function Repository() {
               {/* File browser */}
               <div className="file-browser">
                 <div className="file-header-row">
-                  <img src="https://avatars.githubusercontent.com/u/0" width="20" height="20"
-                    style={{ borderRadius: '50%' }} alt="user" />
-                  <span className="file-header-user">GitbotUser</span>
+                  <img src={profile.image || "https://avatars.githubusercontent.com/u/0"} width="20" height="20"
+                    style={{ borderRadius: '50%', objectFit: 'cover' }} alt="user" />
+                  <span className="file-header-user">{profile.name}</span>
                   <span className="file-header-msg">
                     {filteredLang ? `Showing ${filteredLang} files` : 'Updated project files'}
                   </span>
@@ -503,39 +651,39 @@ export default function Repository() {
 
           {/* About */}
           <div className="sidebar-block">
-            <div className="sidebar-block-title">About</div>
-            <p className="sidebar-about">No description provided.</p>
+            <div className="sidebar-block-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>About</span>
+              <button className="topbar-icon-btn" style={{ padding: '2px' }} title={editingAbout ? 'Cancel' : 'Edit About'}
+                onClick={() => { setEditingAbout(v => !v); setAboutDraft(about); }}>
+                {editingAbout ? <X size={13} /> : <Edit3 size={13} />}
+              </button>
+            </div>
+            {editingAbout ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <textarea
+                  className="input"
+                  rows={4}
+                  style={{ width: '100%', resize: 'vertical', fontSize: '13px' }}
+                  value={aboutDraft}
+                  onChange={e => setAboutDraft(e.target.value)}
+                  placeholder="Add a short description…"
+                />
+                <button className="button button-primary" style={{ fontSize: '12px' }}
+                  onClick={async () => {
+                    await api?.saveRepoAbout?.(name!, aboutDraft);
+                    setAbout(aboutDraft);
+                    setEditingAbout(false);
+                  }}>
+                  <Save size={12} /> Save
+                </button>
+              </div>
+            ) : (
+              <p className="sidebar-about">{about || 'No description provided.'}</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* File Viewer Modal */}
-      {viewingFile && (
-        <div className="modal-backdrop" onClick={() => setViewingFile(null)}>
-          <div className="file-modal" onClick={e => e.stopPropagation()}>
-            <div className="file-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <File size={15} />
-                <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{viewingFile.name}</span>
-              </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button className="button" style={{ fontSize: '12px' }}
-                  onClick={() => handleOpenFile(viewingFile.path)}>
-                  <ExternalLink size={13} /> Open externally
-                </button>
-                <button className="button" style={{ fontSize: '12px' }}
-                  onClick={() => navigator.clipboard.writeText(viewingFile.content)}>
-                  Copy
-                </button>
-                <button className="topbar-icon-btn" onClick={() => setViewingFile(null)}><X size={16} /></button>
-              </div>
-            </div>
-            <div className="file-modal-body">
-              <Markdown content={`\`\`\`${viewingFile.name.split('.').pop()}\n${viewingFile.content}\n\`\`\``} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

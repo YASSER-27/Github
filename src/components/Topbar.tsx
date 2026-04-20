@@ -98,16 +98,15 @@ export default function Topbar() {
             <img src={gitbotLogo} alt="Gitbot" />
           </Link>
 
-          <div className="topbar-search">
-            <input type="text" placeholder="Search or jump to…" spellCheck={false} />
-          </div>
-
           <nav className="topbar-nav">
-            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>Repositories</Link>
+            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>GITBOT</Link>
             <Link to="/ai" className={isActive('/ai') ? 'active' : ''}>AI Copilot</Link>
+            <Link to="/profile?tab=repos" className={isActive('/profile?tab=repos') ? 'active' : ''}>Repositories</Link>
             <Link to="/settings" className={isActive('/settings') ? 'active' : ''}>Settings</Link>
             <Link to="/templates" className={isActive('/templates') ? 'active' : ''}>Templates</Link>
             <Link to="/pages" className={isActive('/pages') ? 'active' : ''}>Pages</Link>
+            <Link to="/review" className={isActive('/review') ? 'active' : ''}>Review Editor</Link>
+            <Link to="/draw" className={isActive('/draw') ? 'active' : ''}>Draw</Link>
           </nav>
         </div>
 

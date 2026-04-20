@@ -1,11 +1,10 @@
 {
   "name": "gitbot",
   "productName": "Gitbot",
-  "version": "1.0.0",
-  "description": "A local GitHub-style repository manager with AI Copilot",
+  "version": "1.2.1",
+  "description": "local GitBot AI Copilot",
   "author": {
-    "name": "YASSER-27",
-    "email": "yasser-27@gitbot.local"
+    "name": "YASSER-27"
   },
   "private": true,
   "main": "dist-electron/main.js",
@@ -18,34 +17,44 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dist": "npm run build && electron-builder --win",
-    "dist:portable": "npm run build && electron-builder --win portable"
+    "dist": "npm run build && npm run obfuscate && electron-builder --win",
+    "dist:portable": "npm run build && npm run obfuscate && electron-builder --win portable",
+    "obfuscate": "npx javascript-obfuscator dist-electron --output dist-electron --compact true --string-array true --control-flow-flattening true"
   },
   "build": {
     "appId": "com.yasser27.gitbot",
     "productName": "Gitbot",
-    "copyright": "Copyright © 2025 YASSER-27",
+    "npmRebuild": false,
+    "copyright": "Copyright (c) 2026 YASSER-27",
     "directories": {
       "output": "release"
     },
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
-      "assets/**/*",
       "package.json"
     ],
     "extraResources": [
       {
         "from": "cpp",
         "to": "cpp",
-        "filter": ["*.exe", "*.dll"]
+        "filter": [
+          "*.exe",
+          "*.dll"
+        ]
+      },
+      {
+        "from": "assets",
+        "to": "assets"
       }
     ],
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico"
@@ -64,7 +73,10 @@
       "deleteAppDataOnUninstall": false,
       "license": null,
       "menuCategory": "Gitbot",
-      "installerLanguages": ["en_US", "ar"],
+      "installerLanguages": [
+        "en_US",
+        "ar"
+      ],
       "perMachine": false
     },
     "mac": {
@@ -77,10 +89,12 @@
     }
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.0",
     "@types/archiver": "^7.0.0",
     "archiver": "^7.0.1",
     "commander": "^14.0.3",
     "lucide-react": "^1.8.0",
+    "mermaid": "^11.14.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
@@ -106,6 +120,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "javascript-obfuscator": "^5.4.1",
     "sass": "^1.99.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",

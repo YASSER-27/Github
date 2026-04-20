@@ -7,6 +7,8 @@ import Settings from './pages/Settings';
 import AIPanel from './pages/AIPanel';
 import Templates from './pages/Templates';
 import Pages from './pages/Pages';
+import Review from './pages/Review';
+import Draw from './pages/Draw';
 import './App.css';
 
 function App() {
@@ -21,8 +23,8 @@ function App() {
         // Show intro if not disabled (default is true)
         if (s?.introEnabled !== false) {
           setShowIntro(true);
-          setTimeout(() => setIntroFading(true), 2500); // Start fading out at 2.5s
-          setTimeout(() => setShowIntro(false), 3000); // Remove completely at 3s
+          setTimeout(() => setIntroFading(true), 1500); // Start fading out at 1.5s
+          setTimeout(() => setShowIntro(false), 2000); // Remove completely at 2s
         }
       });
     }
@@ -40,9 +42,8 @@ function App() {
                 <div className="ai-circle"></div>
               </div>
             </div>
-            <h1 className="intro-title">Gitbot Ai Copilot</h1>
-            <h2 className="intro-subtitle">Gitbot</h2>
-            <p className="intro-author">Yasser27</p>
+            <h1 className="intro-title">Gitbot</h1>
+            <p className="intro-author">YASSER-27</p>
           </div>
         </div>
       )}
@@ -56,6 +57,8 @@ function App() {
           <Route path="/ai" element={<AIPanel />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/pages" element={<Pages />} />
+          <Route path="/review" element={<Review />} />
+          <Route path="/draw" element={<Draw />} />
         </Routes>
       </div>
     </div>

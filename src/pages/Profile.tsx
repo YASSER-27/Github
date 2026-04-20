@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Book, Users, MapPin, Building, Star, Trash2, Plus } from 'lucide-react';
 import gitbotLogo from '../assets/gitbot.png';
+import Markdown from '../components/Markdown';
 import './Profile.css';
 
 interface Settings {
@@ -26,6 +27,8 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState('overview');
   const [stars, setStars] = useState<string[]>([]);
   const [aboutMap, setAboutMap] = useState<Record<string, string>>({});
+  const [profileReadme, setProfileReadme] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const loadRepos = async () => {
     if (window.api) {
@@ -41,6 +44,13 @@ export default function Profile() {
     }
   };
 
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'repos' || tab === 'repositories') setActiveTab('repos');
+  }, [searchParams]);
+
   useEffect(() => {
     if (window.api) {
       window.api.getSettings().then((s: any) => {
@@ -53,6 +63,27 @@ export default function Profile() {
       setRepos(['gitbot', 'react-project', 'test-app']);
     }
   }, []);
+
+  useEffect(() => {
+    if (window.api) {
+      // Improved matching: Check for display name OR slugified version (no spaces)
+      const profileSlug = settings.profileName.toLowerCase().replace(/\s+/g, '');
+      const specialRepo = repos.find(r =>
+        r.toLowerCase() === settings.profileName.toLowerCase() ||
+        r.toLowerCase() === profileSlug
+      );
+
+      if (specialRepo) {
+        window.api.getReadme(specialRepo).then(content => {
+          setProfileReadme(content || '');
+        });
+      } else {
+        setProfileReadme('');
+      }
+    } else {
+      setProfileReadme('');
+    }
+  }, [repos, settings.profileName]);
 
 
   const handleDelete = async (repo: string) => {
@@ -97,7 +128,7 @@ export default function Profile() {
           </div>
           <div className="profile-detail-item">
             <Building size={16} />
-            <span>Gitbot Local Hub</span>
+            <span>Gitbot</span>
           </div>
         </div>
       </aside>
@@ -116,6 +147,16 @@ export default function Profile() {
 
         {activeTab === 'overview' && (
           <div className="fade-in">
+            {profileReadme && (
+              <div style={{ marginBottom: '24px', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '16px', backgroundColor: 'var(--bg-secondary)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  {settings.profileName} / README.md
+                </span>
+                <div style={{ marginTop: '12px' }}>
+                  <Markdown content={profileReadme} repoName={settings.profileName} />
+                </div>
+              </div>
+            )}
             <div className="pinned-header">{stars.length > 0 ? 'Starred repositories' : 'Your repositories'}</div>
             {repos.length === 0 ? (
               <div style={{ color: 'var(--text-secondary)', padding: '24px 0' }}>
@@ -150,7 +191,16 @@ export default function Profile() {
 
         {activeTab === 'repos' && (
           <div className="fade-in">
-            <div className="repos-toolbar" style={{ justifyContent: 'flex-end' }}>
+            <div className="repos-toolbar" style={{ justifyContent: 'space-between' }}>
+              <div className="repo-search-container">
+                <input 
+                  type="text" 
+                  className="input repo-search-input" 
+                  placeholder="Find a repository..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
               <button className="button button-primary" onClick={() => window.dispatchEvent(new CustomEvent('open-new-repo'))}>
                 <Plus size={15} /> New
               </button>
@@ -162,32 +212,40 @@ export default function Profile() {
               </div>
             )}
 
-            {repos.map(repo => (
-              <div key={repo} className="repo-list-item">
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                    <Link to={`/repo/${repo}`} className="repo-list-name">{repo}</Link>
-                    <span className="badge">Public</span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-                    {aboutMap[repo] || 'A locally managed gitbot repository'}
-                  </p>
-                  <div className="repo-card-meta">
-                    <span><span className="lang-dot" style={{ backgroundColor: '#2b7489' }} />TypeScript</span>
-                    <span>Updated recently</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '8px', flex: 'none' }}>
-                  <button className="button" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: stars.includes(repo) ? 'var(--accent-color)' : '' }} onClick={() => handleToggleStar(repo)}>
-                    <Star size={14} fill={stars.includes(repo) ? 'currentColor' : 'none'} />
-                    {stars.includes(repo) ? 'Starred' : 'Star'}
-                  </button>
-                  <button className="button button-danger" onClick={() => handleDelete(repo)}>
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+            {repos.filter(r => r.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && searchQuery && (
+              <div style={{ color: 'var(--text-secondary)', padding: '32px 0', textAlign: 'center' }}>
+                No repositories matching "<b>{searchQuery}</b>" found.
               </div>
-            ))}
+            )}
+
+            {repos
+              .filter(r => r.toLowerCase().includes(searchQuery.toLowerCase()))
+              .map(repo => (
+                <div key={repo} className="repo-list-item">
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                      <Link to={`/repo/${repo}`} className="repo-list-name">{repo}</Link>
+                      <span className="badge">Public</span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                      {aboutMap[repo] || 'A locally managed gitbot repository'}
+                    </p>
+                    <div className="repo-card-meta">
+                      <span><span className="lang-dot" style={{ backgroundColor: '#2b7489' }} />TypeScript</span>
+                      <span>Updated recently</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flex: 'none' }}>
+                    <button className="button" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: stars.includes(repo) ? 'var(--accent-color)' : '' }} onClick={() => handleToggleStar(repo)}>
+                      <Star size={14} fill={stars.includes(repo) ? 'currentColor' : 'none'} />
+                      {stars.includes(repo) ? 'Starred' : 'Star'}
+                    </button>
+                    <button className="button button-danger" onClick={() => handleDelete(repo)}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
           </div>
         )}
       </main>

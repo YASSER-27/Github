@@ -44,74 +44,204 @@
   --shadow: 0 8px 40px rgba(0,0,0,0.8);
 }
 
-/* ── Modern Aurora — Deep space purple/teal ── */
+/* ── Modern Aurora — Indigo & Teal ── */
 [data-theme="modern-aurora"] {
-  --bg-color: #08081a;
-  --bg-secondary: rgba(15,15,40,0.85);
-  --bg-tertiary: rgba(25,25,55,0.9);
-  --text-primary: #f0f4ff;
-  --text-secondary: #8899cc;
-  --border-color: rgba(100,120,255,0.2);
-  --accent-color: #7c6ae8;
+  --bg-color: #060813;
+  --bg-secondary: #0c1228;
+  --bg-tertiary: #182245;
+  --text-primary: #e0f2fe;
+  --text-secondary: #7dd3fc;
+  --border-color: #1e293b;
+  --accent-color: #22d3ee;
   --green: #4ade80;
   --red: #f87171;
-  --btn-bg: rgba(100,120,255,0.1);
-  --btn-hover: rgba(100,120,255,0.2);
-  --header-bg: rgba(10,10,30,0.95);
-  --shadow: 0 8px 40px rgba(100,80,255,0.3);
-  --theme-blob-1: radial-gradient(ellipse at 20% 20%, rgba(120,80,255,0.4) 0%, transparent 60%);
-  --theme-blob-2: radial-gradient(ellipse at 80% 80%, rgba(0,200,200,0.3) 0%, transparent 60%);
-  --theme-blob-3: radial-gradient(ellipse at 50% 60%, rgba(60,0,180,0.2) 0%, transparent 50%);
+  --btn-bg: #1e293b;
+  --btn-hover: #334155;
+  --header-bg: #020617;
+  --shadow: 0 10px 40px rgba(6,182,212,0.25);
 }
 
-/* ── Modern Midnight — Warm gold/dark navy ── */
+/* ── Modern Midnight — Gold & Charcoal ── */
 [data-theme="modern-midnight"] {
-  --bg-color: #06070f;
-  --bg-secondary: rgba(10,12,25,0.88);
-  --bg-tertiary: rgba(18,20,38,0.9);
-  --text-primary: #eee8d5;
-  --text-secondary: #8a7e6a;
-  --border-color: rgba(180,140,60,0.18);
-  --accent-color: #f5a623;
-  --green: #58cc82;
-  --red: #ff6b6b;
-  --btn-bg: rgba(180,140,60,0.1);
-  --btn-hover: rgba(180,140,60,0.2);
-  --header-bg: rgba(6,7,18,0.96);
-  --shadow: 0 8px 40px rgba(200,130,0,0.25);
-  --theme-blob-1: radial-gradient(ellipse at 15% 50%, rgba(200,130,0,0.3) 0%, transparent 55%);
-  --theme-blob-2: radial-gradient(ellipse at 85% 20%, rgba(100,60,200,0.3) 0%, transparent 55%);
-  --theme-blob-3: radial-gradient(ellipse at 50% 90%, rgba(220,80,50,0.2) 0%, transparent 50%);
+  --bg-color: #0c0c0c;
+  --bg-secondary: #141414;
+  --bg-tertiary: #1e1e1e;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a0a0a0;
+  --border-color: #262626;
+  --accent-color: #d4af37;
+  --green: #52c41a;
+  --red: #ff4d4f;
+  --btn-bg: #1e1e1e;
+  --btn-hover: #262626;
+  --header-bg: #000000;
+  --shadow: 0 10px 40px rgba(212,175,55,0.15);
 }
 
-/* ── Modern Crimson — Red/dark emerald ── */
-[data-theme="modern-crimson"] {
-  --bg-color: #0a0608;
-  --bg-secondary: rgba(18,10,14,0.88);
-  --bg-tertiary: rgba(28,14,20,0.9);
-  --text-primary: #f5eef0;
-  --text-secondary: #9a7880;
-  --border-color: rgba(220,60,80,0.18);
-  --accent-color: #e53e5b;
-  --green: #38d9a9;
-  --red: #ff8787;
-  --btn-bg: rgba(220,60,80,0.1);
-  --btn-hover: rgba(220,60,80,0.2);
-  --header-bg: rgba(10,6,8,0.96);
-  --shadow: 0 8px 40px rgba(220,40,70,0.3);
-  --theme-blob-1: radial-gradient(ellipse at 25% 30%, rgba(220,40,70,0.4) 0%, transparent 55%);
-  --theme-blob-2: radial-gradient(ellipse at 75% 70%, rgba(30,180,120,0.3) 0%, transparent 55%);
-  --theme-blob-3: radial-gradient(ellipse at 60% 20%, rgba(150,0,80,0.25) 0%, transparent 50%);
+/* ── Modern Ocean — Deep Blue & Cyan ── */
+[data-theme="modern-ocean"] {
+  --bg-color: #020617;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border-color: #1e40af;
+  --accent-color: #38bdf8;
+  --green: #10b981;
+  --red: #ef4444;
+  --header-bg: #020617;
 }
 
-/* ── Modern Neon — Cyan & Pink ── */
+/* ── Modern Forest — Emerald & Sage ── */
+[data-theme="modern-forest"] {
+  --bg-color: #061006;
+  --bg-secondary: #0d2613;
+  --bg-tertiary: #183e20;
+  --text-primary: #ecfdf5;
+  --text-secondary: #6ee7b7;
+  --border-color: #064e3b;
+  --accent-color: #10b981;
+  --green: #34d399;
+  --red: #f87171;
+  --header-bg: #022c22;
+}
+
+/* ── Modern Neon — Hot Pink & Electric Blue ── */
 [data-theme="modern-neon"] {
   --bg-color: #050505;
-  --bg-secondary: rgba(10,15,20,0.88);
-  --bg-tertiary: rgba(20,25,30,0.9);
-  --text-primary: #e0fbfc;
-  --text-secondary: #98c1d9;
-  --border-color: rgba(0,255,255,0.2);
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #f472b6;
+  --accent-color: #f472b6;
+  --green: #39ff14;
+  --red: #ff0055;
+  --header-bg: #000000;
+  --shadow: 0 10px 50px rgba(244,114,182,0.3);
+}
+
+/* ── AI Reasoning & Scaffolding UI ── */
+.ai-reasoning-block {
+  margin: 12px 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.ai-reasoning-block summary {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: var(--bg-tertiary);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.ai-reasoning-block summary:hover {
+  color: var(--accent-color);
+  background: var(--btn-hover);
+}
+
+.ai-reasoning-content {
+  padding: 16px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.7;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+.ai-plan-container {
+  margin: 20px 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.ai-plan-header {
+  padding: 14px 18px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: var(--accent-color);
+  font-size: 14px;
+}
+
+.ai-plan-file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ai-plan-file-item {
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s;
+}
+
+.ai-plan-file-item:last-child {
+  border-bottom: none;
+}
+
+.ai-plan-file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.ai-plan-file-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.ai-plan-file-path {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.ai-plan-expand-icon {
+  color: var(--text-secondary);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-plan-file-item.expanded .ai-plan-expand-icon {
+  transform: rotate(90deg);
+}
+
+.ai-plan-file-preview {
+  padding: 16px;
+  background: var(--bg-color);
+  border-top: 1px solid var(--border-color);
+  font-size: 12.5px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modern Crimson — Cherry & Charcoal ── */
+[data-theme="modern-crimson"] {
   --accent-color: #00ffff;
   --green: #39ff14;
   --red: #ff0055;
@@ -260,6 +390,86 @@
   --theme-blob-1: radial-gradient(ellipse at 20% 30%, rgba(244,114,182,0.4) 0%, transparent 55%);
   --theme-blob-2: radial-gradient(ellipse at 80% 70%, rgba(167,139,250,0.3) 0%, transparent 55%);
   --theme-blob-3: radial-gradient(ellipse at 55% 55%, rgba(190,24,93,0.2) 0%, transparent 50%);
+}
+
+/* ── Modern Amber — Amber Gold & Pitch Black ── */
+[data-theme="modern-amber"] {
+  --bg-color: #080604;
+  --bg-secondary: rgba(18,10,5,0.88);
+  --bg-tertiary: rgba(28,15,8,0.9);
+  --text-primary: #fff8e7;
+  --text-secondary: #cc9933;
+  --border-color: rgba(255,191,0,0.2);
+  --accent-color: #ffbf00;
+  --green: #4ade80;
+  --red: #f87171;
+  --btn-bg: rgba(255,191,0,0.1);
+  --btn-hover: rgba(255,191,0,0.2);
+  --header-bg: rgba(8,6,4,0.96);
+  --shadow: 0 8px 40px rgba(255,191,0,0.2);
+  --theme-blob-1: radial-gradient(ellipse at 25% 35%, rgba(255,191,0,0.25) 0%, transparent 60%);
+  --theme-blob-2: radial-gradient(ellipse at 85% 75%, rgba(255,140,0,0.2) 0%, transparent 60%);
+  --theme-blob-3: radial-gradient(ellipse at 50% 50%, rgba(200,100,0,0.15) 0%, transparent 55%);
+}
+
+/* ── Modern Obsidian Gold — Obsidian & Bright Gold ── */
+[data-theme="modern-obsidian-gold"] {
+  --bg-color: #040404;
+  --bg-secondary: rgba(15,15,15,0.88);
+  --bg-tertiary: rgba(25,25,25,0.9);
+  --text-primary: #ffffff;
+  --text-secondary: #b39b30;
+  --border-color: rgba(255,215,0,0.25);
+  --accent-color: #ffd700;
+  --green: #a3e635;
+  --red: #ff4d4f;
+  --btn-bg: rgba(255,215,0,0.1);
+  --btn-hover: rgba(255,215,0,0.2);
+  --header-bg: rgba(4,4,4,0.96);
+  --shadow: 0 8px 40px rgba(255,215,0,0.25);
+  --theme-blob-1: radial-gradient(circle at 15% 20%, rgba(255,215,0,0.3) 0%, transparent 60%);
+  --theme-blob-2: radial-gradient(circle at 85% 85%, rgba(204,170,0,0.2) 0%, transparent 60%);
+  --theme-blob-3: radial-gradient(circle at 50% 80%, rgba(150,120,0,0.15) 0%, transparent 55%);
+}
+
+/* ── Modern Sunset — Sunset Gold & Deep Maroon ── */
+[data-theme="modern-sunset"] {
+  --bg-color: #0f0505;
+  --bg-secondary: rgba(25,12,12,0.88);
+  --bg-tertiary: rgba(40,18,18,0.9);
+  --text-primary: #ffebd6;
+  --text-secondary: #cc7a29;
+  --border-color: rgba(255,153,51,0.25);
+  --accent-color: #ff9933;
+  --green: #34d399;
+  --red: #ef4444;
+  --btn-bg: rgba(255,153,51,0.15);
+  --btn-hover: rgba(255,153,51,0.25);
+  --header-bg: rgba(15,5,5,0.96);
+  --shadow: 0 8px 40px rgba(255,153,51,0.3);
+  --theme-blob-1: radial-gradient(ellipse at 30% 70%, rgba(255,153,51,0.35) 0%, transparent 60%);
+  --theme-blob-2: radial-gradient(ellipse at 70% 30%, rgba(255,69,0,0.25) 0%, transparent 60%);
+  --theme-blob-3: radial-gradient(ellipse at 50% 50%, rgba(200,50,0,0.2) 0%, transparent 55%);
+}
+
+/* ── Modern Desert — Warm Sand & Rich Gold ── */
+[data-theme="modern-desert"] {
+  --bg-color: #0a0805;
+  --bg-secondary: rgba(20,16,8,0.88);
+  --bg-tertiary: rgba(32,26,16,0.9);
+  --text-primary: #faebd7;
+  --text-secondary: #a88a32;
+  --border-color: rgba(230,184,0,0.2);
+  --accent-color: #e6b800;
+  --green: #a3e635;
+  --red: #f87171;
+  --btn-bg: rgba(230,184,0,0.1);
+  --btn-hover: rgba(230,184,0,0.2);
+  --header-bg: rgba(10,8,5,0.96);
+  --shadow: 0 8px 40px rgba(230,184,0,0.2);
+  --theme-blob-1: radial-gradient(ellipse at 20% 60%, rgba(230,184,0,0.3) 0%, transparent 60%);
+  --theme-blob-2: radial-gradient(ellipse at 80% 40%, rgba(204,163,0,0.25) 0%, transparent 60%);
+  --theme-blob-3: radial-gradient(ellipse at 50% 20%, rgba(150,110,0,0.15) 0%, transparent 55%);
 }
 
 /* ── Reset ── */

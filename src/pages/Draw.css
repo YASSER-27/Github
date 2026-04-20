@@ -1,0 +1,316 @@
+.draw-page {
+  width: 100%;
+  height: calc(100vh - 48px);
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.draw-container {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Decorative Backdrop */
+.draw-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  transition: background 1s ease;
+}
+
+.blur-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.orb-1 { width: 500px; height: 500px; top: -100px; left: -100px; }
+.orb-2 { width: 600px; height: 600px; bottom: -150px; right: -150px; }
+.orb-3 { width: 400px; height: 400px; top: 30%; left: 50%; }
+
+/* Themes */
+.theme-default { background: var(--bg-primary); }
+.theme-default .orb-1 { background: var(--accent-color); opacity: 0.1; }
+.theme-default .orb-2 { background: var(--bg-tertiary); opacity: 0.1; }
+
+.theme-ocean { background: #051923; }
+.theme-ocean .orb-1 { background: #00a8e8; }
+.theme-ocean .orb-2 { background: #007ea7; }
+.theme-ocean .orb-3 { background: #003459; }
+
+.theme-sunset { background: #1a0633; }
+.theme-sunset .orb-1 { background: #ff006e; }
+.theme-sunset .orb-2 { background: #8338ec; }
+.theme-sunset .orb-3 { background: #fb5607; }
+
+.theme-nebula { background: #0b090a; }
+.theme-nebula .orb-1 { background: #5a189a; }
+.theme-nebula .orb-2 { background: #ff85a1; }
+.theme-nebula .orb-3 { background: #480ca8; }
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(100px, 50px) scale(1.1); }
+}
+
+/* AI Assistant Floating Window */
+.draw-ai-window {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  width: 280px;
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+}
+
+.draw-ai-window.closed {
+  transform: scale(0.9) translateY(-10px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.window-header {
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.02);
+}
+
+.window-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent-color);
+}
+
+.window-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+}
+
+.window-close:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.window-content {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.window-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.window-textarea {
+  width: 100%;
+  min-height: 80px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+}
+
+.window-textarea:focus { border-color: var(--accent-color); }
+
+.window-btn {
+  background: var(--accent-color) !important;
+  color: white !important;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.window-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.window-btn.new-btn {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color);
+  margin-top: -4px;
+}
+
+.window-btn.new-btn:hover { background: var(--border-color) !important; }
+
+.window-error {
+  padding: 8px;
+  background: rgba(255, 0, 0, 0.05);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.window-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(0,0,0,0.2);
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.theme-switcher { display: flex; gap: 8px; }
+
+.theme-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.theme-dot.active { border-color: white; transform: scale(1.2); }
+.theme-dot.default { background: #2c2c2c; }
+.theme-dot.ocean { background: #007ea7; }
+.theme-dot.sunset { background: #ff006e; }
+.theme-dot.nebula { background: #5a189a; }
+
+.window-footer span { font-size: 10px; color: var(--text-secondary); opacity: 0.6; }
+
+/* Toggle Button */
+.sidebar-toggle {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  z-index: 201;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--accent-color);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   AGGRESSIVE HIDE RULES
+   ────────────────────────────────────────────────────────────────────────── */
+.excalidraw .Footer,
+.excalidraw [data-testid="mermaid"],
+.excalidraw button[data-testid="mermaid"],
+.excalidraw [title*="Mermaid"],
+.excalidraw [aria-label*="Mermaid"],
+.excalidraw .main-menu-dropdown--socials {
+  display: none !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   UI POSITIONING (Surgical Fix)
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* 1. Reset Top Menu Layout to prevent "Full Width Bar" */
+.excalidraw .App-menu_top {
+  position: absolute !important;
+  top: 15px !important;
+  left: 15px !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  pointer-events: none !important;
+}
+
+/* 2. Burger Menu specifically */
+.excalidraw .App-menu__left {
+  pointer-events: auto !important;
+  background: rgba(30, 30, 30, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* 3. FLOAT TOOLS TO BOTTOM CENTER - COMPLETELY DISCONNECTED FROM TOP MENU */
+.excalidraw .App-toolbar {
+  position: fixed !important;
+  bottom: 25px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  margin: 0 !important;
+  pointer-events: auto !important;
+  background: rgba(28, 28, 35, 0.95) !important; /* Darker, focused background */
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 12px !important;
+  padding: 5px 12px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
+  display: flex !important;
+  gap: 4px !important;
+  z-index: 1000 !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* Excalidraw Global Style Adjustments */
+.excalidraw {
+  background: transparent !important;
+  --color-primary: var(--accent-color) !important;
+}
+
+.excalidraw .layer-ui__wrapper {
+  background: transparent !important;
+}
+
+/* Menu Themes Branding */
+.menu-themes-section { padding: 12px 14px; }
+.menu-themes-label { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+.theme-switcher.in-menu { justify-content: flex-start; }
+.ai-spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

@@ -193,3 +193,55 @@
 }
 .file-modal-body { flex: 1; overflow: auto; padding: 0; }
 .file-modal-body .code-block-wrapper { margin: 0 !important; border-radius: 0 !important; border: none !important; }
+
+/* ── New Editor Styles ── */
+.file-modal-title {
+  display: flex; align-items: center; gap: 10px;
+  min-width: 0; flex: 1; margin-right: 16px;
+}
+.file-name-scroll {
+  font-family: monospace; font-size: 13px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-modal-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.file-editor-textarea {
+  width: 100%; height: 100%; min-height: 60vh;
+  background: var(--bg-color); color: var(--text-primary);
+  border: none; padding: 24px; font-family: 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 13px; line-height: 1.6; resize: none; outline: none;
+  border-bottom: 1px solid var(--border-color);
+}
+.file-modal-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color); border-radius: 0 0 10px 10px;
+}
+.editor-hint { font-size: 11px; color: var(--text-secondary); }
+
+.image-viewer-container {
+  padding: 40px; display: flex; justifyContent: center;
+  background: var(--bg-secondary); min-height: 300px;
+}
+.viewer-img {
+  max-width: 100%; max-height: 70vh; object-fit: contain;
+  border-radius: 4px; box-shadow: var(--shadow);
+}
+
+/* ── Live Preview Styles ── */
+.preview-modal {
+  background: #fff; width: 95vw; height: 90vh;
+  border-radius: 12px; border: 1px solid var(--border-color);
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.8);
+}
+.preview-modal-body { flex: 1; background: #fff; }
+.preview-iframe {
+  width: 100%; height: 100%; border: none;
+  background: #fff;
+}
+.preview-modal .file-modal-header {
+  background: var(--bg-color); color: var(--text-primary);
+}
+
+

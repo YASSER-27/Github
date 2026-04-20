@@ -64,12 +64,35 @@
   border-bottom: 1px solid var(--border-color);
   font-size: 12px;
 }
+.code-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.code-header-left:hover {
+  background: rgba(255,255,255,0.05);
+}
+.code-header-left svg {
+  color: var(--text-secondary);
+}
 .code-lang-badge {
   color: var(--text-secondary); font-family: monospace;
   background: var(--bg-secondary); padding: 2px 8px;
   border-radius: 10px; border: 1px solid var(--border-color);
   font-size: 11px;
 }
+.code-block-wrapper.minimized {
+  margin-bottom: 8px;
+}
+.code-block-wrapper.minimized .code-header {
+  border-bottom: none;
+  border-radius: 6px;
+}
+
 .code-header-actions { display: flex; gap: 6px; }
 .code-action-btn {
   display: flex; align-items: center; gap: 4px;
@@ -87,5 +110,89 @@
 
 .code-fallback { margin: 0; padding: 16px; overflow-x: auto; background: transparent; }
 .code-fallback code { font-size: 13px; }
+
+/* ── Diagrams ── */
+.diagram-wrapper {
+  margin: 1.5rem 0;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.code-lang-badge.diagram {
+  background: rgba(47,129,247,0.1);
+  color: var(--accent-color);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diagram-content {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  background: var(--bg-color);
+  overflow-x: auto;
+}
+
+.mermaid-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  max-height: 450px;
+  min-height: 100px;
+  overflow-y: auto;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.1);
+  padding: 10px;
+  position: relative;
+  transition: opacity 0.2s;
+  scroll-behavior: auto !important; /* disable smooth scroll during anchor restoration */
+}
+
+.mermaid-container.rendering {
+  opacity: 0.8;
+}
+
+.mermaid-container svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.mermaid-error {
+  padding: 24px;
+  color: var(--red);
+  background: rgba(248,81,73,0.05);
+  border: 1px dashed var(--red);
+  font-size: 13px;
+  text-align: center;
+  border-radius: 6px;
+  margin: 10px;
+}
+
+.mermaid-loading {
+  padding: 40px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+  font-style: italic;
+}
+
+.md-p {
+    margin: 1em 0;
+}
+
+.inline-code {
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: var(--bg-tertiary);
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+}
 
 
