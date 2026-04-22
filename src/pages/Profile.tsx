@@ -21,7 +21,7 @@ export default function Profile() {
     profileName: 'Developer',
     profileImage: '',
     country: 'Unknown',
-    bio: 'Local software engineer using Gitbot.',
+    bio: 'Local software engineer using GitFusion X.',
   });
   const [repos, setRepos] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
@@ -128,7 +128,7 @@ export default function Profile() {
           </div>
           <div className="profile-detail-item">
             <Building size={16} />
-            <span>Gitbot</span>
+            <span>GitFusion X</span>
           </div>
         </div>
       </aside>

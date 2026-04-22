@@ -386,12 +386,22 @@ export default function AIPanel() {
         {/* Topbar */}
         <div className="ai-topbar">
           <div className="ai-topbar-left">
-            <span className="ai-model-label">
-              <span className={`status-text ${isRunning ? 'online' : (isStarting || isConnecting ? 'starting' : 'offline')}`}>
+            <div className="button" style={{ 
+              cursor: 'default', 
+              fontSize: '11px', 
+              padding: '4px 8px',
+              borderColor: isStarting || isConnecting ? 'var(--orange)' : 'var(--border-color)'
+            }}>
+              <div className={`ai-status-dot ${isRunning ? 'running' : (isStarting || isConnecting ? 'starting' : '')}`} style={{ width: '8px', height: '8px' }} />
+              <span style={{ 
+                color: isRunning ? 'var(--text-primary)' : (isStarting || isConnecting ? 'var(--orange)' : 'var(--text-secondary)'),
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
                 {isRunning ? 'Connected' : (isStarting || isConnecting ? 'Connecting...' : 'Offline')}
               </span>
-
-            </span>
+            </div>
           </div>
           {engineError && (
             <div className="ai-engine-error-bubble" onClick={() => setEngineError(null)} title="Click to dismiss">
@@ -536,7 +546,7 @@ export default function AIPanel() {
                   <div className="ai-circle"></div>
                 </div>
               </div>
-              <h3>Gitbot AI Assistant</h3>
+              <h3>GitFusion X AI Assistant</h3>
               <p>Ask anything about code, use <code>/plan</code> to scaffold, <code>/thinking</code> for deep reasoning, or <code>/diagram</code> for charts.</p>
               <div className="ai-hints">
                 <span onClick={() => setInput('/thinking Explain complex neural networks')}>/thinking Analysis</span>
@@ -750,7 +760,7 @@ function AIMessage({ role, content, reasoning, image, stats, onImageClick, onEdi
     <div className={`ai-msg ${role}`}>
       <div className="ai-msg-body">
         <div className="ai-msg-text">
-          {reasoning && (
+          {reasoning && thinkingMode === 'think' && (
             <details className="ai-reasoning-block" open={isStreaming}>
               <summary>AI Reasoning</summary>
               <div className="ai-reasoning-content">

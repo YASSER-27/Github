@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('api', {
   changeWorkspace: () => ipcRenderer.invoke('change-workspace'),
   changeWorkspaceDefault: () => ipcRenderer.invoke('change-workspace-default'),
   exportMultiRepos: (repos: string[]) => ipcRenderer.invoke('export-multi-repos', repos),
+  pickImageModel: () => ipcRenderer.invoke('pick-image-model'),
 
   // Repos
   getRepos: () => ipcRenderer.invoke('get-repos'),
@@ -57,6 +58,22 @@ contextBridge.exposeInMainWorld('api', {
   copyAIModel: (sourcePath: string) => ipcRenderer.invoke('copy-ai-model', sourcePath),
   deleteModelFile: (filePath: string) => ipcRenderer.invoke('delete-model-file', filePath),
   getAIError: () => ipcRenderer.invoke('get-ai-error'),
+  generateImage: (options: any) => ipcRenderer.invoke('generate-image', options),
+  stopGenerateImage: () => ipcRenderer.invoke('stop-generate-image'),
+  getGeneratedImages: () => ipcRenderer.invoke('get-generated-images'),
+  deleteGeneratedImage: (path: string) => ipcRenderer.invoke('delete-generated-image', path),
+  getImageGenStatus: () => ipcRenderer.invoke('get-image-gen-status'),
+  getImageGenLastResult: () => ipcRenderer.invoke('get-image-gen-last-result'),
+  onImageGenComplete: (callback: (result: any) => void) => {
+    const sub = (_: any, data: any) => callback(data);
+    ipcRenderer.on('image-gen-complete', sub);
+    return () => ipcRenderer.removeListener('image-gen-complete', sub);
+  },
+  onImageGenLog: (callback: (log: string) => void) => {
+    const sub = (_: any, data: any) => callback(data);
+    ipcRenderer.on('image-gen-log', sub);
+    return () => ipcRenderer.removeListener('image-gen-log', sub);
+  },
   onCopyProgress: (callback: any) => {
     const subscription = (_: any, data: any) => callback(data);
     ipcRenderer.on('copy-progress', subscription);

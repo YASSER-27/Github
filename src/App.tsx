@@ -9,6 +9,7 @@ import Templates from './pages/Templates';
 import Pages from './pages/Pages';
 import Review from './pages/Review';
 import Draw from './pages/Draw';
+import ImageGenerator from './pages/ImageGenerator';
 import './App.css';
 
 function App() {
@@ -42,7 +43,7 @@ function App() {
                 <div className="ai-circle"></div>
               </div>
             </div>
-            <h1 className="intro-title">Gitbot</h1>
+            <h1 className="intro-title">GitFusion X</h1>
             <p className="intro-author">YASSER-27</p>
           </div>
         </div>
@@ -59,6 +60,7 @@ function App() {
           <Route path="/pages" element={<Pages />} />
           <Route path="/review" element={<Review />} />
           <Route path="/draw" element={<Draw />} />
+          <Route path="/image-generator" element={<ImageGenerator />} />
         </Routes>
       </div>
     </div>

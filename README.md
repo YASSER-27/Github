@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="assets/GitBot.png" width="150" alt="Edit Img Tool Logo">
-  <h1 align="center">Gitbot</h1>
-  <p align="center">Advanced Local AI Project Manager</p>
+  <img src="Pack/GitBot.png" width="150" alt="GITFUSION X Logo">
+  <h1 align="center">GITFUSION X </h1>
+  <p align="center">The Ultimate Open Source Local AI Workspace</p>
 </p>
 <p align="center">
   <a href="https://github.com/YASSER-27/Github/releases">
@@ -12,207 +12,86 @@
 <p align="center">
   <a href="#english-version">English Version</a> • <a href="#النسخة-العربية">النسخة العربية</a>
 </p>
-<p align="center">Experience the power of GitHub, locally. No cloud, no limits—just you and your coder</p>
+<p align="center">Unify Code. Automate Intelligence. Build the Future. 100% Local. 100% Private.</p>
 
 
-<h2 id="english-version">English Version</h2>
+<h2 id="english-version">GITFUSION X </h2>
 
-> Welcome to **Gitbot**, a professional, fully offline, and highly secure Desktop application built with **Electron + React + Vite**. Gitbot is designed as your intelligent AI copilot and version control hub, managing your code repositories and giving you instant AI insights entirely on your local machine.
+> **GITFUSION X** is a high-performance, private-first AI ecosystem built with **Electron + React + Vite**. It redefines the local workspace by combining advanced AI vision, local LLM inference via Llama.cpp, and a secure repository system. Stop waiting for the cloud—take control of your intelligence locally.
 
->  Gitbot v1.1.1 — Security, Performance & Theming Update
-This release focuses on hardening the application for production use, improving system resource management, and expanding the visual customization options available to users.
+`GITFUSION X Ecosystem`
 
- `Gitbot`
+<img src="Pack/git_information.png" alt="GITFUSION X Overview" width="1000">
 
-<img src="Pack/overview.jpg" alt="27 in space" width="960">
+[Download for Windows](https://github.com/YASSER-27/Github/releases)
 
+### 1. Vision Intelligence (Real Eyes)
+Stop describing pixels with text. Drop any image—from complex UI designs to fine art—and let the Vision engine break it down into detailed descriptions, prompts, and actionable code snippets. It's fast, offline, and actually understands context.
 
-# Security Hardening
-> The Electron backend is now compiled through a dedicated obfuscation pass using javascript-obfuscator, making the distributed binary resistant to source extraction. A strict Content-Security-Policy has been enforced at the document level, blocking any injected scripts that may originate from untrusted markdown content inside repositories. In production builds, the developer tools and default system application menus are completely disabled.
-# Resource Management & Stability
-> The AI server process (llama-server) now terminates forcefully and immediately when the application exits, using a taskkill /F call that ensures all locked DLL resources are released. This prevents build failures caused by file locks from a previous session. The application also correctly displays its tray icon after packaging by relocating the assets directory to extraResources, placing them outside the ASAR archive where the file system can resolve them at runtime.
-# Auto-Connect Model Memory
-> The last successfully loaded AI model path is now persisted in the application's configuration file. On the next launch, Gitbot reads this path and starts the AI engine automatically, eliminating the need to re-select the model each session.
-# New Themes
-> Four new animated dark themes have been added to the existing palette, all sharing a warm, gold-toned aesthetic: Amber Gold, Obsidian Gold, Sunset, and Desert. Each uses layered radial gradients animated in the background to give the interface a living, premium feel.
-# Documentation
-> The README has been fully restructured with a bilingual layout — English and Arabic — connected via quick-jump navigation anchors. A themes reference table, a security section, and an updated build guide are now included.
+<img src="Pack/img2txt.png" alt="Vision AI" width="960">
 
-[Download Gitbot windows](https://github.com/YASSER-27/Github/releases/download/v1.1.1/Gitbot.Setup.1.1.1.exe)
+### 2. Local Diffusion & Creation
+Transform your thoughts into high-fidelity visuals using local diffusion models. Generate stunning artwork and design assets directly on your GPU with zero subscription fees and zero data mining.
 
-## Key Features
+<img src="Pack/txt2img.png" alt="Image Generation" width="960">
 
-### 1. 100% Offline AI Inference (Llama)
-- **Local & Private:** Gitbot connects directly to an onboard `llama-server.exe` instance running locally via C++. Zero telemetry, zero cloud calls, completely air-gapped processing.
-- **AI Copilot & Code Generation:** A dedicated AI Chat interface lets you ideate, debug, and write code.
-- **Auto-Connect Memory Tracker:** Intelligently remembers your last used local model and dynamically boots without manual path reconfiguration.
-- **Instant Project Scaffolding:** Use the powerful `/plan` command in the AI Copilot. The AI will instantly generate an entire project structure and create all the necessary files simultaneously inside your repositories.
+### 3. Intelligent Drawing & Architecture
+Visualize the logic before touching the keyboard. Use the integrated diagramming suite to map out project logic, system architectures, and workflows. It’s a perfect tool for planning your development cycle.
 
-### 2. Intelligent Repository Management
-- **Centralized Hub:** All your projects are stored cleanly outside the application scope in `~/.gitbot/repos`, ensuring your work is persistent and immune to application updates or uninstalls.
-- **Smart Folder Imports:** Upload any local project, and Gitbot intelligently crawls and imports the files cleanly without weird folder-nesting behaviors.
-- **Snapshot (Commit) System:** Save the state of your project by making a "Commit". Gitbot packages the entire state into a secure `.zip` file stored safely in the project's background `commits` folder. Revert or inspect previous states instantly.
-- **Releases:** Export and compile finished projects as versions (e.g., v1.0.0) ready for deployment.
+<img src="Pack/ai-draw.png" alt="Diagramming Tool" width="960">
 
-`settings`
+### 4. Secure Local Repositories
+We built a repository system that feels just like GitHub, minus the servers. Manage all your projects in a secure, encrypted environment that lives entirely on your machine. 100% safe, 100% yours.
 
-<img src="Pack/settings.jpg" alt="27 in space" width="960">
+<img src="Pack/repositories.png" alt="Secure Repos" width="960">
 
-### 3. State-of-the-art UI / UX
-- **Dynamic Theming Ecosystem:** A highly optimized css-variable engine allowing rapid, real-time transitions between an extensive palette of beautifully crafted environments. Available layout selections feature:
+### 5. 18 Professional Themes
+Personalize your workspace with 18 beautifully crafted themes, ranging from minimal dark modes to vibrant "Aurora" and "Cyberpunk" palettes. Designed for modern developers who value aesthetics.
 
-  | Category | Available Themes |
-  |----------|-----------------|
-  | Minimalist | Light Mode, Default Dark, GitHub Deep, Dark Pure |
-  | Animated Aurora | Modern Aurora, Modern Ocean, Modern Forest, Modern Rose |
-  | Neon & Cyberpunk| Modern Neon, Modern Synthwave, Modern Crimson, Modern Glass |
-  | Warm & Golden   | Modern Midnight, Amber Gold, Obsidian Gold, Sunset, Desert |
+| Category | Available Themes |
+|----------|-----------------|
+| Minimalist | Light Mode, Default Dark, GitHub Deep, Dark Pure |
+| Animated Aurora | Modern Aurora, Modern Ocean, Modern Forest, Modern Rose |
+| Neon & Cyberpunk| Modern Neon, Modern Synthwave, Modern Crimson, Modern Glass |
+| Warm & Golden   | Modern Midnight, Amber Gold, Obsidian Gold, Sunset, Desert |
 
-- **Custom Markdown Renderer:** The integrated file viewer employs `react-markdown` with strict custom bridging protocols (`gitbot-repo://` and `gitbot-profile://`). This architecture seamlessly bypasses structural CSP firewalls, securely importing and rendering proprietary local images directly inside the documentation.
-- **Persistent Interface Layout:** The user layout mimicking high-end engineering IDEs persistently maintains sidebars, files, and project states completely cleanly across system reboots.
-
-### 4. Enterprise-Grade Security & Performance
-- **Zero-Footprint Idle Saver:** The internal engine automatically goes into deep sleep mode after 5 minutes of inactivity (`--sleep-idle-seconds`), flushing VRAM and saving laptop batteries.
-- **V8 Obfuscation Shield:** Core logic is scrambled using `javascript-obfuscator` during the build export, protecting proprietary logic inside the packaged ASAR archive.
-- **UI Lockdown:** Native Electron developer tools (F12) and system application menus are strictly disabled on deployment to prevent reverse engineering.
-- **Cross-Site Scripting (XSS) Policy:** Hardened Content-Security-Policy (CSP) headers block malicious payload execution when rendering insecure markdown documents.
-
-## /diagram
-
-> **Ask `/diagram` to visualize anything you imagine.** >
-
-<img src="Pack/diagram mode.jpg" alt="27 in space" width="960">
-
-
-<div class="container">
-                <div class="title-block">
-                    <h2 data-i18n="cmd_title">Shortcuts &amp; CLI</h2>
-                </div>
-                <div class="cmd-split">
-                    <div class="cmd-card">
-                        <h3 data-i18n="cmd_hotkeys">Hotkeys</h3>
-                        <ul class="key-list">
-                            <li><kbd>F9</kbd> <span data-i18n="key_toggle">Toggle Visibility</span></li>
-                            <li><kbd>Ctrl + R</kbd> <span data-i18n="key_reload">Force Reload</span></li>
-                            <li><kbd>Ctrl + F</kbd> <span data-i18n="key_search">Smart Search</span></li>
-                        </ul>
-                    </div>
-                    <div class="cmd-card">
-                        <h3 data-i18n="cmd_cli">gbot CLI</h3>
-                        <ul class="cli-list">
-                            <li><code>gbot commit</code> — <span data-i18n="cli_commit">Quick Snapshot</span></li>
-                            <li><code>gbot status</code> — <span data-i18n="cli_status">Diff View</span></li>
-                            <li><code>/plan</code> — <span data-i18n="cli_plan">AI Scaffolding</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-## Technical Architecture
-
-- **Frontend:** React + Vite, fully statically typed with TypeScript. Uses `lucide-react` for beautiful vector icons.
-- **Backend (Node.js/Electron):** The `electron/main.ts` orchestrates the local OS bridging. It manages:
-  - File archiving and zipping utilizing `archiver` package.
-  - Spawning the background AI processes with configured multithreading (`--ctx-size 8192`, `--parallel 1`, etc.).
-  - Bypassing standard secure web contexts via `protocol.registerSchemesAsPrivileged` to map system folder paths perfectly.
-- **AI Connectivity:** Communicates with the AI via a fetch API wrapper (`AIContext.tsx`) that intercepts streaming chunks and processes them flawlessly even if the AI randomly cuts out. A heavily optimized Fallback JSON parser reliably rebuilds interrupted AI generation streams.
-
-## /plan 
-
-> **Ask `/plan`for creat full project auto
-
-<img src="Pack/plan mod.jpg" alt="27 in space" width="960">
-
-## How to run locally
-
-### 1. Setup Environment
-Ensure you have Node.js installed. Gitbot utilizes models locally, you can select them dynamically in the settings or place a default `.gguf` AI model at the path: `cpp/gemma-4-E2B-it-Q4_K_M.gguf`. (A compliant `llama-server.exe` must exist in `cpp/`).
-
-### 2. Start Developing
-```bash
-npm install
-npm run dev
-```
-Wait 2 to 3 seconds for the Main process to spawn the AI server in the background.
-
-### 3. Build & Package
-```bash
-npm run build
-npm run dist
-```
-This prepares the React UI, statically compiles the Vite output into `dist/`, executes javascript obfuscator for backend security, and prepares the Electron binaries to be packed into a portable executable.
-
-## Developer
-Engineered & Designed by **YASSER-27**.
-Built with precision for uncompromised local AI productivity.
+### 6. Technical Excellence
+- **Frontend:** React + Vite + TypeScript for a blazing fast UI.
+- **AI Core:** Llama.cpp for raw, offline inference power.
+- **Privacy:** Hardened CSP headers and V8 obfuscation shield.
+- **Power:** Automatic idle-sleep mode to save VRAM and battery.
 
 ---
 
 <h2 id="النسخة-العربية">النسخة العربية</h2>
 
-> مرحبًا بك في **Gitbot**، تطبيق سطح مكتب احترافي، يعمل بالكامل دون الحاجة للإنترنت، وهو محمي ومؤمن بشدة بفضل برمجته عبر **Electron + React + Vite**. تم تصميم Gitbot ليكون المساعد الذكي لإدارة شفراتك ومستودعاتك البرمجية وتوفير ميزة الذكاء الاصطناعي على جهازك المحلي فقط.
+> **GITFUSION X** هو منظومة عمل ذكاء اصطناعي متكاملة، مفتوحة المصدر، ومصممة لتكون خاصة بالكامل. تم بناؤه باستخدام **Electron + React + Vite** ليعيد تعريف مساحة العمل المحلية من خلال دمج تقنيات الرؤية المتقدمة، معالجة اللغات المحلية عبر Llama.cpp، ونظام مستودعات آمن تماماً.
 
-[تحميل تطبيق Gitbot للويندوز](https://github.com/YASSER-27/Github/releases/download/v1.1.1/Gitbot.Setup.1.1.1.exe)
+[تحميل GITFUSION X للويندوز](https://github.com/YASSER-27/Github/releases)
 
 ## الميزات الرئيسية
 
-### 1. ذكاء اصطناعي محلي 100% (Llama)
-- **خصوصية مطلقة:** يتصل البرنامج مباشرة بخادم `llama-server.exe` مدمج ومبرمج بالـ C++. بدون أي تتبع، أو اتصال سحابي، مما يجعله محميًا ومعزولًا كليًا.
-- **توليد الكود البرمجي والمساعدة:** من خلال واجهة المحادثة المدمجة للذكاء الاصطناعي يمكنك كتابة الأكواد، طرح الأسئلة أو حل المشاكل البرمجية.
-- **ذاكرة النماذج التلقائية:** يحفظ خادم البرنامج بذكاء مسار آخر نموذج ذكاء اصطناعي محلي استخدمته ليقوم بتشغيله فورًا عند الفتح القادم بدون إعداد يدوي للنموذج.
-- **بناء المشاريع التلقائي:** يمكنك استخدام الأمر القوي `/plan` داخل المحادثة. أين سيقوم الذكاء الاصطناعي ببناء وبدء هندسة مشروع كامل وتوليد جميع الملفات المرافقة داخل المستودع بضغطة زر.
+### 1. ذكاء اصطناعي بعيون حقيقية (Vision)
+توقف عن وصف الصور بالكلمات. اسحب أي لقطة شاشة أو تصميم وشاهد محرك الرؤية وهو يحللها ويحولها إلى أوصاف برمجية دقيقة وأوامر جاهزة للاستخدام. كل هذا يتم محلياً دون مغادرة بياناتك لجهازك.
 
-### 2. إدارة مستودعات الأكواد بذكاء
-- **المركز الرئيسي:** جميع ملفات مشاريعك تُحفظ بشكل نظيف بمسار `~/.gitbot/repos` خارج صلاحيات البرنامج الأساسية، لضمان استمرارية أمان ملفاتك حتى بعد حذف أو تحديث البرنامج.
-- **استيراد المجلدات الذكي:** ارفع أو اسحب أي مشروع محلي، ليقوم Gitbot بقرائته وتهيئته أوتوماتيكيًا.
-- **نظام الحفظ اللحظي (Commit System):** يمكنك حفظ الوضع الحالي لمشروعك عبر أخذ "Commit". حيث يقوم Gitbot بسحب حالة مشروعك وحفظها كملف مجمد `.zip` في ملف داخلي آمن يسمى `commits`. يمكنك دائمًا العودة لأي حالة سابقة واسترجاع مشاريعك ببساطة.
-- **الإصدارات (Releases):** تصدير المجلد النهائي من المشاريع كإصدار نهائي (مثل: v1.0.0) وتهيئته للنشر.
+### 2. توليد الفن الرقمي محلياً
+حول أفكارك إلى لوحات فنية وأصول تصميم عالية الجودة باستخدام موديلات الـ Diffusion المحلية. لا أرصدة، لا فلاتر سحابية، فقط قوة كرت الشاشة الخاص بك.
 
-### 3. واجهة رسومية بمعايير حديثة كلياً
-- **بيئة ثيمات متجاوبة وديناميكية:** نظام برمجي محسن يسمح بالانتقال الفوري والسلس بين مجموعة واسعة من البيئات البصرية المصممة بعناية فائقة. تتضمن قائمة بيئات العمل الاحترافية المتاحة:
+### 3. التخطيط الهندسي الذكي
+ارسم منطق مشروعك قبل البدء في الكود. استخدم أدوات الرسم المدمجة لتخطيط بنية النظام وتدفق البيانات، مما يجعل تفكيرك منظماً ومشاريعك ناجحة منذ اللحظة الأولى.
 
-  | الفئة | الثيمات المتاحة |
-  |-------|-----------------|
-  | التصميم البسيط (Minimalist) | الوضع المضيء، المظلم الافتراضي، GitHub Deep، Dark |
-  | الألوان الطبيعية المتحركة | Aurora، Ocean، Forest، Rose |
-  | النيون والتصاميم الحيوية | Neon، Synthwave، Crimson، Glass |
-  | التصاميم الذهبية الدافئة | Midnight، Amber Gold، Obsidian Gold، Sunset، Desert |
+### 4. مستودعات محلية آمنة
+قمنا ببناء نظام مستودعات يشبه تجربة GitHub ولكن بدون خوادم خارجية. مشاريعك الخاصة ستبقى خاصة حقاً، مشفرة، ومخزنة على قرصك الصلب فقط.
 
-- **قارئ المارکداون الخاص (Markdown Renderer):** قارئ ملفات مبرمج ومدمج يتزامن مع خطوط بروتوكولات محلية آمنة (`gitbot-repo://` و `gitbot-profile://`). هذه الخاصية تتيح فك جدران الحماية الصارمة من أجل استدعاء وقراءة الصور التابعة للمشاريع داخل الملفات النصية بانسيابية وأمان.
-- **تخطيط هندسي دائم:** منصة العمل مصممة لتحاكي بيئات التطوير المتكاملة (IDE) الاحترافية. حيث يحتفظ النظام بوضعية النوافذ والشاشات بعد كل دورة تشغيل لضمان استمرارية العمل باحترافية.
-
-### 4. حماية وتوفير طاقة بمعايير المؤسسات
-- **نظام السكون لتوفير الموارد:** محرك النظام يقفز فورًا لحالة نوم عميق بعد مرور 5 دقائق من الخمول، للحد من حجز كروت الشاشة (VRAM) ومنع استهلاك بطارية الحواسيب.
-- **جدار حماية (Obfuscation):** في النسخ المخصصة للنشر، يتم تشفير أجزاء البرمجة العميقة بواسطة `javascript-obfuscator` لتحويل الشفرات الهجينة لطلاسم معمّاة تمنع سرقة ميكانيكية عمل البرنامج واستخراج أكواده.
-- **غلق واجهات التطوير:** للنسخة المصدرة، يغلق البرنامج جميع خيارات قوائم ويندوز التخريبية ويمنع الوصول لشاشات التطوير (F12) كلياً لحماية البيانات.
-- **وقاية ضد حقن الثغرات (CSP/XSS):** حوائط أمنية ديناميكية للمحتوى تحظر أي أسطر غريبة أو محاولات إدراج و حقن سكربتات ضارة داخل الملفات الكتابية للمشاريع لمنع هجمات (XSS).
+### 5. 18 ثيم احترافي
+خصص بيئة عملك بما يناسب ذوقك. يأتي GITFUSION X مع 18 ثيماً مصمماً بعناية، من الأوضاع المظلمة البسيطة إلى ألوان "النيون" و"الأورورا" النابضة بالحياة.
 
 ## الهيكلة التقنية
-- **الواجهة الأمامية:** مُصممة باستخدام مكتبة React ومجمّع سريع (Vite) وببنية Typescript وتعتمد على إيقونات `lucide-react`.
-- **الواجهة الخلفية (Node.js/Electron):** يقوم ملف الجسر (`main.ts`) بالتنسيق المباشر والمزامنة مع خصائص نظام التشغيل:
-  - معالجات الأرشفة للمشاريع بواسطة `archiver`.
-  - إدارة العمليات الخلفية الخاصة بالـ AI وتحديد الأنوية المستعملة.
-  - تخطي سياقات المتصفح الآمنة لربط الملفات باستخدام قنوات `protocol.registerSchemesAsPrivileged`.
-
-## كيفية التشغيل (للمطورين)
-
-### 1. إعداد البيئة
-يرجى التأكد من توفر Node.js. برنامج Gitbot يستخدم محركات نماذج الـ AI محلياً، ويوصى بأن يتم تحميل نموذج بصيغة `.gguf` (مثل Gemma).
-
-### 2. بدء التطوير (Dev)
-```bash
-npm install
-npm run dev
-```
-سيقوم البرنامج بالإقلاع مع الواجهة الجانبية والقيام بتشغيل الـ Llama Server في الخلفية باختيار مسار النموذج المحفوظ لديك أوتوماتيكيًا.
-
-### 3. الصقل والبناء (Build)
-```bash
-npm run build
-npm run dist
-```
-هذا الأمر مخصص لتجميع جميع صفحات الـ UI وتسليح الواجهة الخلفية عبر الـ Obfuscator وتجهيز ملف البرنامج كملف تنفيذي احترافي قابل للنشر.
+- **الواجهة الأمامية:** React + Vite مع دعم كامل للـ TypeScript.
+- **محرك الذكاء:** يعتمد على Llama.cpp للحصول على أقصى أداء دون إنترنت.
+- **الأمن:** تشفير V8 وجدران حماية CSP لحماية الكود والبيانات.
+- **توفير الطاقة:** نظام سكون تلقائي (Idle Sleep) للحفاظ على موارد الجهاز والبطارية.
 
 ## المطور
 صناعة وهندسة **YASSER-27**.  
-مبني بدقة والتزام لتقديم إنتاجية فائقة وخدمة ذكاء اصطناعي محلي غير مسبوقة!
+مبني بدقة لتقديم إنتاجية فائقة وخصوصية لا تساوم.

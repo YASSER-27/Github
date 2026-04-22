@@ -283,12 +283,11 @@ export function AIProvider({ children }: { children: React.ReactNode }) {
     setIsStreaming(true);
     setError(null);
 
+    const isDirectMode = thinkingMode === 'none' && !isThinking;
     let sysPrompt = 'Professional coding assistant. No emojis.';
-    let thinkingDisabled = false;
     try {
       const s = await (window as any).api?.getSettings();
       sysPrompt = s?.systemPrompt || sysPrompt;
-      thinkingDisabled = !!s?.disableThinking;
       
       // OPTIMIZATION: Skip skill files for Vision tasks to speed up pre-fill (Time-To-First-Token)
       if (s?.skillFiles?.length && !currentImage) {
@@ -296,8 +295,8 @@ export function AIProvider({ children }: { children: React.ReactNode }) {
         if (skillContent.length > 800) skillContent = skillContent.substring(0, 800) + "\n\n...(Skills truncated for speed)...";
         sysPrompt += `\n\n# Skills\n${skillContent}`;
       }
-      if (thinkingDisabled) {
-        sysPrompt = '/no_think\n' + sysPrompt + '\n\n[INST: respond directly without any <think> or reasoning block. Be concise and immediate.]';
+      if (isDirectMode) {
+        sysPrompt = 'You are a professional assistant. Answer directly and concisely. No thinking blocks allowed.';
       }
     } catch {}
 
@@ -345,68 +344,124 @@ export function AIProvider({ children }: { children: React.ReactNode }) {
           messages: apiHistory,
           stream: true,
           temperature: (isPlan || isThinking) ? 0.2 : 0.7,
-          max_tokens: 4096
+          max_tokens: 4096,
+          // Suppress thinking tokens in direct mode (llama.cpp / Qwen thinking models)
+          ...(isDirectMode ? {
+            thinking: { type: 'disabled' },
+            budget_tokens: 0,
+          } : {}),
         }),
       });
 
       if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
 
+      // 🚀 PERFORMANCE OPTIMIZATION: Throttle state updates during streaming
+      let lastUpdateTime = 0; // Set to 0 to ensure the FIRST token is always sent immediately
+      const UPDATE_INTERVAL = 64; 
+
+      // Track think-block state across chunks (for direct mode filtering)
+      let rawBuffer = '';
+      let isInsideThink = false;
+      let isFirstToken = true;
+
+      // Accumulator for streaming tokens to avoid frequent state clones
+      let pendingToken = '';
+      let pendingReasoning = '';
+
+      const finalizeState = (force = false) => {
+        const now = Date.now();
+        // Skip throttle for the first token or if forced
+        if (!force && !isFirstToken && now - lastUpdateTime < UPDATE_INTERVAL) return;
+        
+        lastUpdateTime = now;
+        isFirstToken = false;
+
+        const snapToken = pendingToken;
+        const snapReasoning = pendingReasoning;
+        pendingToken = '';
+        pendingReasoning = '';
+
+        setSessions(prev => prev.map(s => {
+          if (s.id === sessionId) {
+            const arr = [...s.messages];
+            const last = arr[arr.length - 1];
+            if (last?.role === 'assistant') {
+              const raw = (last.raw || '') + snapReasoning + snapToken;
+              let reasoning = (last.reasoning || '') + snapReasoning;
+              let answer = last.content || '';
+
+              if (snapToken) {
+                const lowerRaw = raw.toLowerCase();
+                if (lowerRaw.includes('<think>')) {
+                  const startIdx = lowerRaw.indexOf('<think>');
+                  const endIdx = lowerRaw.indexOf('</think>');
+                  if (endIdx !== -1) {
+                    reasoning = raw.substring(startIdx + 7, endIdx).trim();
+                    answer = (raw.substring(0, startIdx) + raw.substring(endIdx + 8)).trim();
+                  } else {
+                    reasoning = raw.substring(startIdx + 7);
+                    answer = raw.substring(0, startIdx).trim();
+                  }
+                } else {
+                  answer += snapToken;
+                }
+              }
+
+              arr[arr.length - 1] = {
+                ...last,
+                content: answer,
+                reasoning,
+                raw,
+                stats: { 
+                  time: parseFloat(((performance.now() - startTime) / 1000).toFixed(2)), 
+                  tokens: tokenCounter 
+                }
+              };
+            }
+            return { ...s, messages: arr };
+          }
+          return s;
+        }));
+      };
+
       for await (const json of parseJsonlFromResponse<any>(resp)) {
-        // Support both delta.content (OpenAI) and delta.text or text (fallbacks)
-        // Also support delta.reasoning_content for DeepSeek-R1 style models
         const choice = json.choices?.[0];
         const token = choice?.delta?.content ?? choice?.delta?.text ?? choice?.text ?? '';
         const reasoningToken = choice?.delta?.reasoning_content ?? '';
-        
-        if (token || reasoningToken) {
-          tokenCounter++;
-          if (token) fullResponse += token;
 
-          setSessions(prev => prev.map(s => {
-            if (s.id === sessionId) {
-              const arr = [...s.messages];
-              const last = arr[arr.length - 1];
-                if (last?.role === 'assistant') {
-                  // Update raw with both, to allow tag-based parsing to still work
-                  const raw = (last.raw || '') + reasoningToken + token;
-                  let reasoning = (last.reasoning || '') + reasoningToken;
-                  let answer = last.content || '';
-                  
-                  if (token) {
-                    // Robust <think> parsing for models that put tags INSIDE content
-                    const lowerRaw = raw.toLowerCase();
-                    if (lowerRaw.includes('<think>')) {
-                        const startIdx = lowerRaw.indexOf('<think>');
-                        const endIdx = lowerRaw.indexOf('</think>');
-                        if (endIdx !== -1) {
-                          reasoning = raw.substring(startIdx + 7, endIdx).trim();
-                          answer = (raw.substring(0, startIdx) + raw.substring(endIdx + 8)).trim();
-                        } else {
-                          reasoning = raw.substring(startIdx + 7);
-                          answer = raw.substring(0, startIdx).trim();
-                        }
-                    } else { 
-                      // If no tags, append to content
-                      answer += token; 
-                    }
-                  }
+        if (!token && !reasoningToken) continue;
+        tokenCounter++;
 
-                
-                const currentTime = parseFloat(((performance.now() - startTime) / 1000).toFixed(2));
-                arr[arr.length - 1] = { 
-                  ...last, 
-                  content: answer, 
-                  reasoning, 
-                  raw,
-                  stats: { time: currentTime, tokens: tokenCounter }
-                };
-              }
-              return { ...s, messages: arr };
-            }
-            return s;
-          }));
+        // ── DIRECT MODE: hard-block think tokens ───────────────────────────
+        if (isDirectMode) {
+          rawBuffer += token;
+          if (!isInsideThink && rawBuffer.toLowerCase().includes('<think>')) isInsideThink = true;
+          if (isInsideThink && rawBuffer.toLowerCase().includes('</think>')) {
+            isInsideThink = false;
+            const closeIdx = rawBuffer.toLowerCase().indexOf('</think>') + 8;
+            rawBuffer = rawBuffer.substring(closeIdx);
+          }
+          if (isInsideThink) continue;
+
+          const safeToken = rawBuffer;
+          rawBuffer = '';
+          if (!safeToken) continue;
+          
+          fullResponse += safeToken;
+          pendingToken += safeToken;
+          finalizeState();
+          continue;
         }
+        // ── END DIRECT MODE FILTER ─────────────────────────────────────────
+
+        if (token) fullResponse += token;
+        pendingToken += token;
+        pendingReasoning += reasoningToken;
+        finalizeState();
       }
+
+      // Final commit
+      finalizeState(true);
 
 
       if (isPlan && fullResponse) {
@@ -458,7 +513,7 @@ export function AIProvider({ children }: { children: React.ReactNode }) {
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [input, isStreaming, currentSessionId, sessions]);
+  }, [input, isStreaming, currentSessionId, sessions, thinkingMode, selectedImage]);
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
   const messages = currentSession ? currentSession.messages : [];

@@ -477,23 +477,59 @@
 /* ── Message bubbles ── */
 .ai-msg {
   padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.ai-msg.user {
+  align-items: flex-end;
+}
+
+.ai-msg.assistant {
+  align-items: flex-start;
+}
+
+.ai-msg-body {
+  width: fit-content;
+  max-width: 85%;
+  position: relative;
+  transition: all 0.2s ease;
+  unicode-bidi: plaintext;
+  text-align: start;
 }
 
 .ai-msg.user .ai-msg-body {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-radius: 14px 14px 2px 14px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  unicode-bidi: plaintext;
+  text-align: start;
 }
 
 .ai-msg.assistant .ai-msg-body {
-  padding: 8px 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 14px 14px 14px 2px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .ai-msg-text {
   font-size: 15px;
-  line-height: 1.65;
+  line-height: 1.4;
   color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+.ai-msg-text * {
+  unicode-bidi: plaintext;
+  text-align: start;
 }
 
 .ai-reasoning-block {
@@ -643,6 +679,8 @@
   outline: none;
   max-height: 200px;
   min-height: 30px;
+  unicode-bidi: plaintext;
+  text-align: start;
 }
 
 .ai-textarea::placeholder {

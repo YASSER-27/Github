@@ -43,7 +43,11 @@ export default function Settings() {
     followers: 0, following: 0, disableThinking: false, introEnabled: true,
     skillFiles: [] as { name: string; path: string; content: string }[],
     customWorkspace: '',
-    aiModels: [] as { id: string; name: string; modelPath: string; mmprojPath?: string; isActive: boolean }[]
+    aiModels: [] as { id: string; name: string; modelPath: string; mmprojPath?: string; isActive: boolean }[],
+    imageModel: '',
+    imageGenKeepServer: false,
+    fluxModels: { diffusion: '', vae: '', clip_l: '', t5xxl: '' },
+    autoStartAI: true
   });
   const [isStartingModel, setIsStartingModel] = useState<string | null>(null);
 
@@ -87,7 +91,7 @@ export default function Settings() {
   const handleChangeWorkspace = async () => {
     const ok = await (window as any).api?.changeWorkspace();
     if (ok) {
-      alert('Workspace changed successfully. Please reboot Gitbot completely for changes to apply.');
+      alert('Workspace changed successfully. Please reboot GitFusion X completely for changes to apply.');
     }
   };
 
@@ -267,7 +271,7 @@ export default function Settings() {
                 const modelPath = await (window as any).api?.pickModelFile();
                 if (modelPath) {
                   const mmprojPath = await (window as any).api?.pickMmprojFile(); // Optional
-                  
+
                   // Copy files to local models directory
                   let localModelPath = modelPath;
                   let localMmprojPath = mmprojPath;
@@ -287,10 +291,10 @@ export default function Settings() {
                   }
 
                   const baseName = localModelPath.split(/[\\/]/).pop() || 'New Model';
-                  const newModel = { 
-                    id: Date.now().toString(), 
-                    name: baseName, 
-                    modelPath: localModelPath, 
+                  const newModel = {
+                    id: Date.now().toString(),
+                    name: baseName,
+                    modelPath: localModelPath,
                     mmprojPath: localMmprojPath || undefined,
                     isActive: (settings.aiModels || []).length === 0 // Active if first
                   };
@@ -310,12 +314,12 @@ export default function Settings() {
                     <div key={m.id} className={`template-item ${m.isActive ? 'active' : ''}`} style={{ padding: '12px 16px' }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <input 
-                            className="template-label" 
-                            style={{ 
-                              fontWeight: 600, 
-                              background: 'transparent', 
-                              border: 'none', 
+                          <input
+                            className="template-label"
+                            style={{
+                              fontWeight: 600,
+                              background: 'transparent',
+                              border: 'none',
                               color: 'inherit',
                               padding: '0',
                               margin: '0',
@@ -331,11 +335,11 @@ export default function Settings() {
                             }}
                             title="Click to rename"
                           />
-                          <span style={{ 
-                            fontSize: '9px', 
-                            background: m.mmprojPath ? 'var(--accent-color)' : 'var(--bg-tertiary)', 
-                            color: m.mmprojPath ? 'white' : 'var(--text-secondary)', 
-                            padding: '1px 5px', 
+                          <span style={{
+                            fontSize: '9px',
+                            background: m.mmprojPath ? 'var(--accent-color)' : 'var(--bg-tertiary)',
+                            color: m.mmprojPath ? 'white' : 'var(--text-secondary)',
+                            padding: '1px 5px',
                             borderRadius: '4px',
                             textTransform: 'uppercase',
                             fontWeight: 'bold',
@@ -348,17 +352,17 @@ export default function Settings() {
                           {m.modelPath}
                         </div>
                       </div>
-                      
+
                       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 600, color: m.isActive ? 'var(--green)' : 'var(--text-secondary)' }}>
                             {m.isActive ? 'ON' : 'OFF'}
                           </span>
                           <label className="toggle-switch">
-                            <input 
-                              type="checkbox" 
-                              style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} 
-                              checked={m.isActive} 
+                            <input
+                              type="checkbox"
+                              style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
+                              checked={m.isActive}
                               onChange={() => {
                                 const newModels = settings.aiModels.map((item, i) => ({
                                   ...item,
@@ -381,7 +385,7 @@ export default function Settings() {
                           {isStartingModel === m.id && <Loader size={14} className="ai-spin" style={{ color: 'var(--accent-color)' }} />}
                         </div>
 
-                        
+
                         <button className="button button-danger" style={{ padding: '4px', height: '28px', width: '28px' }}
                           onClick={async () => {
                             if (confirm(`Remove model set "${m.name}"? This will also delete the local copy.`)) {
@@ -397,6 +401,59 @@ export default function Settings() {
                   ))
                 )}
               </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-color)', marginTop: '16px' }}>
+                <div>
+                  <label className="form-label" style={{ marginBottom: 0 }}>Auto-Start Chat AI on Launch</label>
+                  <p className="form-hint" style={{ marginTop: '4px', marginBottom: 0 }}>
+                    If enabled, the Chat AI loads into memory when the program starts. Disable this if the app is slow on startup, and you prefer to start it manually in the Copilot.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: settings.autoStartAI !== false ? 'var(--green)' : 'var(--text-secondary)' }}>
+                    {settings.autoStartAI !== false ? 'ON' : 'OFF'}
+                  </span>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
+                      checked={settings.autoStartAI !== false}
+                      onChange={e => set('autoStartAI', e.target.checked)}
+                    />
+                    <span className="slider round" />
+                  </label>
+                </div>
+              </div>
+
+              {/* ── Image Models ── */}
+              <div className="settings-divider" style={{ margin: '32px 0 20px', height: '1px', background: 'var(--border-color)', opacity: 0.5 }} />
+              <div className="settings-section-title" style={{ marginTop: '0' }}><Palette size={18} /> Image Generation Model</div>
+              <p className="form-hint" style={{ marginBottom: '16px' }}>Select a .safetensors or .gguf model for the Image Generator.</p>
+
+              <div className="form-grid">
+                <div className="form-field">
+                  <label className="form-label">Model (.safetensors, .gguf)</label>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <input className="input" style={{ flex: 1 }} value={settings.imageModel || ''} readOnly placeholder="No model selected" />
+                    {settings.imageModel && (
+                      <button className="button button-danger" onClick={() => {
+                        if (confirm('Clear the selected Image Generation Model?')) {
+                          set('imageModel', null);
+                        }
+                      }}>Clear</button>
+                    )}
+                    <button className="button" onClick={async () => {
+                      const p = await (window as any).api?.pickImageModel();
+                      if (p) {
+                        set('imageModel', p);
+                      }
+                    }}>Select</button>
+                  </div>
+                </div>
+
+              </div>
+
+
 
               <button className={`button ${saved ? '' : 'button-primary'} save-btn`} onClick={handleSave}
                 style={{ background: saved ? '#238636' : undefined, marginTop: '24px' }}>
@@ -651,14 +708,14 @@ export default function Settings() {
           {/* ── Info ── */}
           {activeTab === 'info' && (
             <section className="settings-section fade-in">
-              <div className="settings-section-title"><Info size={18} /> About Gitbot</div>
+              <div className="settings-section-title"><Info size={18} /> About GitFusion X</div>
               <div className="info-card">
-                <img src={gitbotLogo} alt="Gitbot" className="info-logo" />
+                <img src={gitbotLogo} alt="GitFusion X" className="info-logo" />
                 <div className="info-content">
-                  <h2 className="info-title">Gitbot</h2>
-                  <p className="info-version">v1.2.0 </p>
+                  <h2 className="info-title">GitFusion X</h2>
+                  <p className="info-version">v1.2.2 </p>
                   <p className="info-desc">
-                    Gitbot is a professional offline-first project manager powered by local AI. Store, organize,
+                    GitFusion X is a professional offline-first project manager powered by local AI. Store, organize,
                     and manage all your code projects without ever leaving your machine. Use simple CLI commands
                     via <code>gbot</code> or the full GUI to commit, release, and chat with your AI copilot.
                   </p>

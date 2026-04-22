@@ -95,12 +95,13 @@ export default function Topbar() {
       <header className="topbar">
         <div className="topbar-left">
           <Link to="/profile" className="topbar-logo">
-            <img src={gitbotLogo} alt="Gitbot" />
+            <img src={gitbotLogo} alt="GitFusion X" />
           </Link>
 
           <nav className="topbar-nav">
-            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>GITBOT</Link>
-            <Link to="/ai" className={isActive('/ai') ? 'active' : ''}>AI Copilot</Link>
+            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>GITFUSION X</Link>
+            <Link to="/ai" className={isActive('/ai') ? 'active' : ''}>Git X AI</Link>
+            <Link to="/image-generator" className={isActive('/image-generator') ? 'active' : ''}>Image Generator</Link>
             <Link to="/profile?tab=repos" className={isActive('/profile?tab=repos') ? 'active' : ''}>Repositories</Link>
             <Link to="/settings" className={isActive('/settings') ? 'active' : ''}>Settings</Link>
             <Link to="/templates" className={isActive('/templates') ? 'active' : ''}>Templates</Link>

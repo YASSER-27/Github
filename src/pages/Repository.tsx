@@ -60,7 +60,7 @@ export default function Repository() {
   const [aboutDraft, setAboutDraft] = useState('');
   
   // Profile
-  const [profile, setProfile] = useState<{ name: string; image: string }>({ name: 'GitbotUser', image: '' });
+  const [profile, setProfile] = useState<{ name: string; image: string }>({ name: 'GitFusionUser', image: '' });
 
   const api = (window as any).api;
 
@@ -108,7 +108,7 @@ export default function Repository() {
     const settings = await api.getSettings();
     if (settings) {
       setProfile({
-        name: settings.profileName || 'GitbotUser',
+        name: settings.profileName || 'GitFusionUser',
         image: settings.profileImage || ''
       });
     }
@@ -375,7 +375,7 @@ export default function Repository() {
                 <iframe
                   id="preview-iframe"
                   src={`gitbot-repo://local/${encodeURIComponent(name!)}/${viewingFile.path}`}
-                  title="Gitbot Live Preview"
+                  title="GitFusion X Live Preview"
                   className="preview-iframe"
                   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                 />

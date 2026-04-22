@@ -134,7 +134,7 @@ export default function Pages() {
         <div className="pages-empty">
           <Globe size={48} color="var(--text-secondary)" />
           <h2>No pages found</h2>
-          <p>Create HTML files in your repositories — Gitbot will detect them automatically.</p>
+          <p>Create HTML files in your repositories — GitFusion X will detect them automatically.</p>
         </div>
       ) : (
         <div className="pages-grid">

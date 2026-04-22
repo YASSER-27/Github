@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, shell, protocol, Tray, Menu, globalShortcut } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, protocol, Tray, Menu, globalShortcut, session } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -25,8 +25,12 @@ let CONFIG_FILE = path.join(GITBOT_DIR, 'config.json');
 let REPOS_DIR = path.join(GITBOT_DIR, 'repos');
 let MODELS_DIR = path.join(GITBOT_DIR, 'models');
 let PROFILE_IMAGE = path.join(GITBOT_DIR, 'profile.png');
+let GENERATED_IMAGES_DIR = path.join(GITBOT_DIR, 'generated_images');
 
 let aiProcess: ChildProcess | null = null;
+let imageGenProcess: ChildProcess | null = null;
+let imageGenStatus: { generating: boolean; prompt?: string; startedAt?: number } = { generating: false };
+let imageGenLastResult: any = null;
 let lastAiError: string | null = null;
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -36,21 +40,21 @@ function killAIProcess() {
   try {
     // Force-kill all llama-server instances to release DLL file locks
     execSync('taskkill /F /IM llama-server.exe /T', { stdio: 'ignore' });
-  } catch {}
+  } catch { }
   try {
-    if (aiProcess) { 
+    if (aiProcess) {
       // Smart: remove listeners to avoid spurious logs during intentional kill
       aiProcess.removeAllListeners('exit');
-      aiProcess.kill('SIGKILL'); 
-      aiProcess = null; 
+      aiProcess.kill('SIGKILL');
+      aiProcess = null;
     }
-  } catch {}
+  } catch { }
 }
 
 
 // Ensure base directories exist
 if (!fs.existsSync(path.join(os.homedir(), '.gitbot'))) fs.mkdirSync(path.join(os.homedir(), '.gitbot'), { recursive: true });
-for (const d of [GITBOT_DIR, REPOS_DIR, MODELS_DIR]) {
+for (const d of [GITBOT_DIR, REPOS_DIR, MODELS_DIR, GENERATED_IMAGES_DIR]) {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
 }
 
@@ -65,9 +69,9 @@ function createWindow() {
       nodeIntegration: false, contextIsolation: true, sandbox: false
     },
   });
-  
+
   mainWindow.once('ready-to-show', () => mainWindow?.show());
-  
+
   if (app.isPackaged) {
     Menu.setApplicationMenu(null);
     mainWindow.webContents.on('devtools-opened', () => {
@@ -109,90 +113,105 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(() => {
-  protocol.registerFileProtocol('gitbot-repo', (request, callback) => {
-    try {
-      // Robust path extraction that handles both gitbot-repo://local/RepoName and gitbot-repo://RepoName
-      let urlPath = request.url.replace('gitbot-repo://local/', '').replace('gitbot-repo://', '');
-      
-      const decoded = decodeURIComponent(urlPath);
-      const fullPath = path.join(REPOS_DIR, decoded);
-      callback({ path: fullPath });
-    } catch { callback({ error: -6 }); }
-  });
-  protocol.registerFileProtocol('gitbot-profile', (request, callback) => {
-    let url = decodeURIComponent(request.url.replace('gitbot-profile://', ''));
-    if (url.match(/^[a-zA-Z]\//)) url = url.charAt(0) + ':' + url.substring(1);
-    try { callback(url); } catch { callback({ error: -6 }); }
-  });
-
-  createWindow();
-  
-  setTimeout(() => {
-    let configObj: any = {};
-    try { if (fs.existsSync(CONFIG_FILE)) configObj = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch {}
-    
-    let aiModel = configObj.aiModels?.find((m: any) => m.isActive);
-    let aiPath = aiModel?.modelPath || configObj.lastModelPath;
-    let mmprojPath = aiModel?.mmprojPath || configObj.lastMmprojPath;
-
-    if (!aiPath || !fs.existsSync(aiPath)) {
-      aiPath = app.isPackaged
-        ? path.join(process.resourcesPath, 'cpp', 'gemma-4-E2B-it-Q4_K_M.gguf')
-        : path.join(__dirname, '../cpp', 'gemma-4-E2B-it-Q4_K_M.gguf');
+    // Setup System Tray
+    const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'assets', 'icon.ico') : path.join(__dirname, '../assets/icon.ico');
+    if (fs.existsSync(iconPath)) {
+      tray = new Tray(iconPath);
+      const contextMenu = Menu.buildFromTemplate([
+        { label: 'Show Gitbot', click: () => mainWindow?.show() },
+        { label: 'Hide Gitbot', click: () => mainWindow?.hide() },
+        { type: 'separator' },
+        { label: 'Quit', click: () => { isQuitting = true; killAIProcess(); app.quit(); } }
+      ]);
+      tray.setToolTip('Gitbot AI Manager');
+      tray.setContextMenu(contextMenu);
+      tray.on('double-click', () => {
+        if (!mainWindow) return;
+        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+      });
+      console.log('Tray initialized successfully');
     }
-    
-    if (fs.existsSync(aiPath)) {
-      console.log('Auto-starting AI...');
-      const serverExe = app.isPackaged
-        ? path.join(process.resourcesPath, 'cpp', 'llama-server.exe')
-        : path.join(__dirname, '../cpp', 'llama-server.exe');
-      if (fs.existsSync(serverExe)) {
-        const args = [
-          '-m', aiPath, 
-          '--port', '8080', 
-          '--ctx-size', '8192', 
-          '--n-predict', '-1',
-          '--threads', Math.max(1, os.cpus().length - 2).toString(),
-          '--parallel', '1',
-          '--batch-size', '512'
-        ];
-        if (mmprojPath && fs.existsSync(mmprojPath)) {
-          args.push('--mmproj', mmprojPath);
+
+    // F9 Global Shortcut
+    const registered = globalShortcut.register('F9', () => {
+      if (!mainWindow) return;
+      if (mainWindow.isVisible()) mainWindow.hide();
+      else mainWindow.show();
+    });
+    if (!registered) console.error('F9 registration failed');
+    else console.log('F9 shortcut registered');
+
+    protocol.registerFileProtocol('gitbot-repo', (request, callback) => {
+      try {
+        // Robust path extraction that handles both gitbot-repo://local/RepoName and gitbot-repo://RepoName
+        let urlPath = request.url.replace('gitbot-repo://local/', '').replace('gitbot-repo://', '');
+
+        const decoded = decodeURIComponent(urlPath);
+        const fullPath = path.join(REPOS_DIR, decoded);
+        callback({ path: fullPath });
+      } catch { callback({ error: -6 }); }
+    });
+    protocol.registerFileProtocol('gitbot-profile', (request, callback) => {
+      let url = decodeURIComponent(request.url.replace('gitbot-profile://', ''));
+      if (url.match(/^[a-zA-Z]\//)) url = url.charAt(0) + ':' + url.substring(1);
+      try { callback(url); } catch { callback({ error: -6 }); }
+    });
+
+    createWindow();
+
+    session.defaultSession.on('will-download', (event, item, webContents) => {
+      // Only ask where to save if it's explicitly downloaded by user
+      item.setSaveDialogOptions({
+        title: 'Save Image',
+        defaultPath: item.getFilename()
+      });
+    });
+
+    setTimeout(() => {
+      let configObj: any = {};
+      try { if (fs.existsSync(CONFIG_FILE)) configObj = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch { }
+
+      if (configObj.autoStartAI !== false) {
+        let aiModel = configObj.aiModels?.find((m: any) => m.isActive);
+        let aiPath = aiModel?.modelPath || configObj.lastModelPath;
+        let mmprojPath = aiModel?.mmprojPath || configObj.lastMmprojPath;
+
+        if (!aiPath || !fs.existsSync(aiPath)) {
+          aiPath = app.isPackaged
+            ? path.join(process.resourcesPath, 'cpp', 'gemma-4-E2B-it-Q4_K_M.gguf')
+            : path.join(__dirname, '../cpp', 'gemma-4-E2B-it-Q4_K_M.gguf');
         }
 
-        aiProcess = spawn(serverExe, args, { detached: true });
-        aiProcess.on('error', () => {});
-        aiProcess.stdout?.on('data', d => console.log(`[AI] ${d}`));
-        aiProcess.stderr?.on('data', d => console.error(`[AI ERR] ${d}`));
-        aiProcess.on('exit', code => console.log(`[AI Exit] code ${code}`));
-        aiProcess.unref();
+        if (fs.existsSync(aiPath)) {
+          console.log('Auto-starting AI...');
+          const serverExe = app.isPackaged
+            ? path.join(process.resourcesPath, 'cpp', 'llama-server.exe')
+            : path.join(__dirname, '../cpp', 'llama-server.exe');
+          const args = [
+            '-m', aiPath,
+            '--port', '8080',
+            '--ctx-size', '8192',
+            '--n-predict', '-1',
+            '--threads', Math.max(1, os.cpus().length - 1).toString(),
+            '--threads-batch', os.cpus().length.toString(),
+            '--parallel', '1',
+            '--batch-size', '512',
+            '--flash-attn', 'auto',
+            '--ctx-shift'
+          ];
+          if (mmprojPath && fs.existsSync(mmprojPath)) {
+            args.push('--mmproj', mmprojPath);
+          }
+
+          aiProcess = spawn(serverExe, args, { detached: true });
+          aiProcess.on('error', () => { });
+          aiProcess.stdout?.on('data', d => console.log(`[AI] ${d}`));
+          aiProcess.stderr?.on('data', d => console.error(`[AI ERR] ${d}`));
+          aiProcess.on('exit', code => console.log(`[AI Exit] code ${code}`));
+          aiProcess.unref();
+        }
       }
-    }
-  }, 2500);
-
-  // Setup System Tray
-  const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'assets', 'icon.ico') : path.join(__dirname, '../assets/icon.ico');
-  if (fs.existsSync(iconPath)) {
-    tray = new Tray(iconPath);
-    const contextMenu = Menu.buildFromTemplate([
-      { label: 'Show Gitbot', click: () => mainWindow?.show() },
-      { label: 'Hide Gitbot', click: () => mainWindow?.hide() },
-      { type: 'separator' },
-      { label: 'Quit', click: () => { isQuitting = true; killAIProcess(); app.quit(); } }
-    ]);
-    tray.setToolTip('Gitbot AI Manager');
-    tray.setContextMenu(contextMenu);
-    tray.on('double-click', () => {
-      mainWindow?.isVisible() ? mainWindow?.hide() : mainWindow?.show();
-    });
-  }
-
-  // F9 Global Shortcut
-  globalShortcut.register('F9', () => {
-    if (!mainWindow) return;
-    if (mainWindow.isVisible()) mainWindow.hide();
-    else mainWindow.show();
-  });
+    }, 2500);
 
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); else mainWindow?.show(); });
 });
@@ -206,7 +225,7 @@ app.on('window-all-closed', () => {
 });
 
 // ─── Window controls ─────────────────────────────────────────────────────────
- // ─── Window controls ─────────────────────────────────────────────────────────
+// ─── Window controls ─────────────────────────────────────────────────────────
 ipcMain.on('win-minimize', () => mainWindow?.minimize());
 ipcMain.on('win-maximize', () => mainWindow?.isMaximized() ? mainWindow.unmaximize() : mainWindow?.maximize());
 ipcMain.on('win-close', () => mainWindow?.hide());
@@ -218,10 +237,12 @@ ipcMain.handle('get-settings', async () => {
     country: 'Unknown', bio: '',
     systemPrompt: 'You are a professional coding assistant. Provide clear, accurate, and concise answers.',
     promptTemplates: [],
-    aiModels: []
+    aiModels: [],
+    imageModel: null,
+    fluxModels: { diffusion: '', vae: '', clip_l: '', t5xxl: '' }
   };
   if (fs.existsSync(CONFIG_FILE)) {
-    try { settings = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch(e) {}
+    try { settings = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch (e) { }
   }
   settings.customWorkspace = customWorkspacePath;
   return settings;
@@ -354,7 +375,7 @@ ipcMain.handle('get-readme', async (_, name: string) => {
           searchReadme(path.join(dir, item.name), depth + 1);
         }
       }
-    } catch {}
+    } catch { }
   };
   searchReadme(repoPath, 0);
 
@@ -429,6 +450,18 @@ ipcMain.handle('pick-model-file', async () => {
   return filePaths[0];
 });
 
+ipcMain.handle('pick-image-model', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow!, {
+    title: 'Select Image Model (.gguf or .safetensors)',
+    filters: [
+      { name: 'Image Models', extensions: ['gguf', 'safetensors', 'sft'] }
+    ],
+    properties: ['openFile']
+  });
+  if (canceled || filePaths.length === 0) return null;
+  return filePaths[0];
+});
+
 ipcMain.handle('pick-mmproj-file', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow!, {
     title: 'Select Vision Projector File (.gguf)',
@@ -480,7 +513,7 @@ ipcMain.handle('pick-skill-files', async () => {
     properties: ['openFile', 'multiSelections']
   });
   if (canceled || filePaths.length === 0) return null;
-  
+
   const results = [];
   for (const p of filePaths) {
     if (fs.existsSync(p) && fs.lstatSync(p).isFile()) {
@@ -551,7 +584,7 @@ ipcMain.handle('upload-file', async (_, repoName: string) => {
     '__pycache__', '.venv', 'venv', 'env', '.env', '.next', '.nuxt',
     '.cache', 'vendor', 'bower_components', 'packages', '.dart_tool',
     'target', 'bin', 'obj', 'Pods', '.gradle', '.idea', '.vs', '.vscode',
-    'coverage', '.nyc_output', 'tmp', 'temp',  '.turbo', '.vercel'
+    'coverage', '.nyc_output', 'tmp', 'temp', '.turbo', '.vercel'
   ]);
 
   const smartCopy = (src: string, dest: string) => {
@@ -632,21 +665,21 @@ ipcMain.handle('create-commit', async (_, name: string, message: string) => {
   const ledger = path.join(repoPath, '.gitbot-commits.json');
   const commits: any[] = fs.existsSync(ledger) ? JSON.parse(fs.readFileSync(ledger, 'utf-8')) : [];
   const id = Date.now().toString(36);
-  
+
   // Create snapshot ZIP
   const gitbotDir = path.join(repoPath, '.gitbot');
   if (!fs.existsSync(gitbotDir)) fs.mkdirSync(gitbotDir, { recursive: true });
   const snapshotZip = path.join(gitbotDir, `${id}.zip`);
-  
+
   await new Promise(resolve => {
     const output = fs.createWriteStream(snapshotZip);
     const archive = archiver('zip', { zlib: { level: 9 } });
     output.on('close', () => resolve(true));
     archive.on('error', () => resolve(false));
     archive.pipe(output);
-    archive.glob('**/*', { 
-      cwd: repoPath, 
-      ignore: ['.gitbot/**', 'node_modules/**', '.gitbot-commits.json', 'releases/**'] 
+    archive.glob('**/*', {
+      cwd: repoPath,
+      ignore: ['.gitbot/**', 'node_modules/**', '.gitbot-commits.json', 'releases/**']
     });
     archive.finalize();
   });
@@ -661,7 +694,7 @@ ipcMain.handle('create-commit', async (_, name: string, message: string) => {
       else snapshot.push(rel);
     }
   };
-  try { scan(repoPath); } catch {}
+  try { scan(repoPath); } catch { }
   commits.unshift({ id, message, date: new Date().toISOString(), files: snapshot });
   fs.writeFileSync(ledger, JSON.stringify(commits, null, 2));
   return { id, date: new Date().toISOString() };
@@ -714,39 +747,39 @@ ipcMain.handle('delete-release', async (_, name: string, filename: string) => {
 ipcMain.handle('start-ai', async (_, providedModelPath?: string, providedMmprojPath?: string) => {
   // if (aiProcess) { aiProcess.kill(); aiProcess = null; }
   killAIProcess(); // Robustly kill previous processes to release file locks (Smart Connection)
-  
+
   // Smart Grace Period: Wait for OS to release Port 8080 and file locks
   await new Promise(r => setTimeout(r, 1500));
 
 
-  
+
   let configObj: any = {};
-  try { if (fs.existsSync(CONFIG_FILE)) configObj = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch {}
+  try { if (fs.existsSync(CONFIG_FILE)) configObj = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')); } catch { }
 
   const modelPath = providedModelPath || configObj.lastModelPath || (
     app.isPackaged
       ? path.join(process.resourcesPath, 'cpp', 'gemma-4-E2B-it-Q4_K_M.gguf')
       : path.join(__dirname, '../cpp', 'gemma-4-E2B-it-Q4_K_M.gguf')
   );
-  
+
   // Only use lastMmprojPath if we are auto-starting (no paths provided)
   // If providedModelPath is given, we should only use providedMmprojPath (which might be null)
   const mmprojPath = (providedModelPath || providedMmprojPath !== undefined)
     ? (providedMmprojPath || null)
     : (configObj.lastMmprojPath || null);
-  
+
   const serverExe = app.isPackaged
     ? path.join(process.resourcesPath, 'cpp', 'llama-server.exe')
     : path.join(__dirname, '../cpp', 'llama-server.exe');
   if (!fs.existsSync(serverExe)) return { success: false, message: 'Server not found' };
   if (!fs.existsSync(modelPath)) return { success: false, message: 'Model not found at ' + modelPath };
-  
+
   const isVision = !!(mmprojPath && fs.existsSync(mmprojPath));
-  
+
   const args = [
-    '-m', modelPath, 
-    '--port', '8080', 
-    '--ctx-size', isVision ? '8192' : '16384', 
+    '-m', modelPath,
+    '--port', '8080',
+    '--ctx-size', isVision ? '8192' : '16384',
     '--n-predict', '4096',
     '--threads', Math.max(1, os.cpus().length - 1).toString(),
     '--threads-batch', os.cpus().length.toString(),
@@ -758,14 +791,14 @@ ipcMain.handle('start-ai', async (_, providedModelPath?: string, providedMmprojP
   if (isVision) {
     args.push('--mmproj', mmprojPath as string);
     // Smart: Add recommended vision tokens for better accuracy
-    args.push('--image-min-tokens', '1024'); 
+    args.push('--image-min-tokens', '1024');
   }
 
-  
+
   aiProcess = spawn(serverExe, args, { detached: true });
 
   lastAiError = null; // Reset error on new start
-  
+
   aiProcess.stdout?.on('data', d => console.log(`[AI] ${d}`));
   aiProcess.stderr?.on('data', d => {
     const msg = d.toString();
@@ -780,27 +813,195 @@ ipcMain.handle('start-ai', async (_, providedModelPath?: string, providedMmprojP
       console.log(`[AI Exit] code ${code}`);
     }
   });
-  
+
   if (providedModelPath) configObj.lastModelPath = providedModelPath;
   if (providedMmprojPath) configObj.lastMmprojPath = providedMmprojPath;
   else if (!providedModelPath && !providedMmprojPath && mmprojPath) configObj.lastMmprojPath = mmprojPath;
-  
+
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(configObj, null, 2));
   return { success: true };
-});
-
-ipcMain.handle('stop-ai', async () => {
-  // if (aiProcess) { aiProcess.kill(); aiProcess = null; return true; }
-  killAIProcess(); // Ensure complete cleanup
-  return true;
 });
 
 ipcMain.handle('ping-ai', async () => {
   try {
     const res = await fetch('http://127.0.0.1:8080/v1/models');
     return res.ok;
-  } catch (e) {
-    return false;
+  } catch { return false; }
+});
+
+ipcMain.handle('generate-image', async (event, options: {
+  prompt: string;
+  modelPath: string;
+  vaePath?: string;
+  clipLPath?: string;
+  t5xxlPath?: string;
+  width?: number;
+  height?: number;
+  steps?: number;
+  cfgScale?: number;
+  seed?: number;
+}) => {
+  const sdCli = app.isPackaged
+    ? path.join(process.resourcesPath, 'cpp', 'sd-cli.exe')
+    : path.join(__dirname, '../cpp', 'sd-cli.exe');
+
+  if (!fs.existsSync(sdCli)) return { success: false, message: 'sd-cli.exe not found' };
+
+  killAIProcess(); // Always stop Chat AI to free up maximum CPU/RAM for generation
+
+  const id = Date.now().toString();
+  const outPath = path.join(GENERATED_IMAGES_DIR, `gen_${id}.png`);
+
+  const allThreads = os.cpus().length;
+
+  const args = [
+    '-m', options.modelPath,
+    '-p', options.prompt,
+    '-o', outPath,
+    '--width', (options.width || 512).toString(),
+    '--height', (options.height || 512).toString(),
+    '--steps', (options.steps || 4).toString(),
+    '--cfg-scale', (options.cfgScale || 2.0).toString(),
+    '--vae-tiling',
+    '--vae-on-cpu', // Reduce peak memory pressure
+    '-s', '-1',
+    '--threads', allThreads.toString(),
+    '--sampling-method', 'euler_a'
+  ];
+
+  // Auto-linking logic for Flux (already passed from frontend if detected, but we ensure they exists)
+  if (options.vaePath && fs.existsSync(options.vaePath)) args.push('--vae', options.vaePath);
+  if (options.clipLPath && fs.existsSync(options.clipLPath)) args.push('--clip_l', options.clipLPath);
+  if (options.t5xxlPath && fs.existsSync(options.t5xxlPath)) args.push('--t5xxl', options.t5xxlPath);
+
+  imageGenStatus = { generating: true, prompt: options.prompt, startedAt: Date.now() };
+  return new Promise((resolve) => {
+    imageGenProcess = spawn(sdCli, args);
+    let output = '';
+
+    imageGenProcess.stdout?.on('data', d => {
+      const line = d.toString();
+      output += line;
+      // Send progress updates if visible in logs (e.g., "[ 25%]")
+      mainWindow?.webContents.send('image-gen-log', line);
+    });
+    imageGenProcess.stderr?.on('data', d => {
+      const line = d.toString();
+      output += line;
+      mainWindow?.webContents.send('image-gen-log', line);
+    });
+
+    imageGenProcess.on('exit', (code) => {
+      imageGenProcess = null;
+      const durationStr = imageGenStatus.startedAt ? ((Date.now() - imageGenStatus.startedAt) / 1000).toFixed(1) : undefined;
+      imageGenStatus = { generating: false };
+
+      if (code === 0 && fs.existsSync(outPath)) {
+        const result = { success: true, imagePath: 'gitbot-profile://' + outPath, prompt: options.prompt, duration: durationStr };
+        imageGenLastResult = result;
+        mainWindow?.webContents.send('image-gen-complete', result);
+        resolve(result);
+      } else {
+        const result = { success: false, message: output || 'Generation failed or stopped', duration: durationStr };
+        imageGenLastResult = result;
+        mainWindow?.webContents.send('image-gen-complete', result);
+        resolve(result);
+      }
+
+      //  Auto-restart Chat AI if it was killed before generation
+      if (!aiProcess) {
+        try {
+          const configObj: any = fs.existsSync(CONFIG_FILE) ? JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8')) : {};
+          const activeModel = configObj.aiModels?.find((m: any) => m.isActive);
+          const aiPath = activeModel?.modelPath || configObj.lastModelPath;
+          const mmprojPath = activeModel?.mmprojPath || configObj.lastMmprojPath || null;
+          const serverExe = app.isPackaged
+            ? path.join(process.resourcesPath, 'cpp', 'llama-server.exe')
+            : path.join(__dirname, '../cpp', 'llama-server.exe');
+
+          if (aiPath && fs.existsSync(aiPath) && fs.existsSync(serverExe)) {
+            const isVision = !!(mmprojPath && fs.existsSync(mmprojPath));
+            const restartArgs = [
+              '-m', aiPath,
+              '--port', '8080',
+              '--ctx-size', isVision ? '8192' : '8192',
+              '--n-predict', '4096',
+              '--threads', Math.max(1, os.cpus().length - 1).toString(),
+              '--threads-batch', os.cpus().length.toString(),
+              '--parallel', '1',
+              '--batch-size', '512',
+              '--flash-attn', 'auto',
+              '--ctx-shift'
+            ];
+            if (isVision) {
+              restartArgs.push('--mmproj', mmprojPath as string);
+              restartArgs.push('--image-min-tokens', '1024');
+            }
+            console.log('[AI] Auto-restarting after image generation...');
+            aiProcess = spawn(serverExe, restartArgs, { detached: true });
+            lastAiError = null;
+            aiProcess.stdout?.on('data', d => console.log(`[AI] ${d}`));
+            aiProcess.stderr?.on('data', d => console.error(`[AI ERR] ${d}`));
+            aiProcess.on('exit', code => { aiProcess = null; console.log(`[AI Exit] code ${code}`); });
+          }
+        } catch (e) {
+          console.error('[AI] Failed to auto-restart after generation:', e);
+        }
+      }
+    });
+
+  });
+});
+
+ipcMain.handle('get-image-gen-status', async () => imageGenStatus);
+
+ipcMain.handle('get-image-gen-last-result', async () => {
+  const result = imageGenLastResult;
+  imageGenLastResult = null; // consume once
+  return result;
+});
+
+ipcMain.handle('stop-generate-image', async () => {
+  if (imageGenProcess) {
+    imageGenProcess.kill();
+    imageGenProcess = null;
+    return true;
+  }
+  return false;
+});
+
+ipcMain.handle('get-generated-images', async () => {
+  if (!fs.existsSync(GENERATED_IMAGES_DIR)) return [];
+  const files = fs.readdirSync(GENERATED_IMAGES_DIR)
+    .filter(f => f.endsWith('.png'))
+    .map(f => ({
+      name: f,
+      path: 'gitbot-profile://' + path.join(GENERATED_IMAGES_DIR, f),
+      date: fs.statSync(path.join(GENERATED_IMAGES_DIR, f)).mtime.toISOString()
+    }))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return files;
+});
+
+ipcMain.handle('delete-generated-image', async (_, imagePath: string) => {
+  try {
+    // If it's a URL with the protocol, extract the real path
+    let realPath = imagePath;
+    if (imagePath.startsWith('gitbot-profile://')) {
+      realPath = imagePath.replace('gitbot-profile://', '');
+      // Handle drive letters if they were transformed (C/ -> C:)
+      if (realPath.match(/^[a-zA-Z]\//)) {
+        realPath = realPath.charAt(0) + ':' + realPath.substring(1);
+      }
+    }
+
+    if (fs.existsSync(realPath)) {
+      fs.unlinkSync(realPath);
+      return { success: true };
+    }
+    return { success: false, message: 'File not found' };
+  } catch (err: any) {
+    return { success: false, message: err.message };
   }
 });
 
@@ -812,12 +1013,12 @@ ipcMain.handle('get-ai-error', async () => {
 ipcMain.handle('create-repo-from-plan', async (_, repoName: string, files: { path: string; content: string }[]) => {
   let finalName = repoName.replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase() || 'ai-project';
   let repoPath = path.join(REPOS_DIR, finalName);
-  
+
   if (fs.existsSync(repoPath)) {
     finalName = `${finalName}-${Date.now().toString().slice(-6)}`;
     repoPath = path.join(REPOS_DIR, finalName);
   }
-  
+
   fs.mkdirSync(repoPath, { recursive: true });
   for (const f of files) {
     const fullPath = path.join(repoPath, f.path);
