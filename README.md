@@ -61,6 +61,9 @@ Personalize your workspace with 18 beautifully crafted themes, ranging from mini
 - **Privacy:** Hardened CSP headers and V8 obfuscation shield.
 - **Power:** Automatic idle-sleep mode to save VRAM and battery.
 
+
+<img src="Pack/GITFUSION.png" alt="GITFUSION X Overview" width="1000">
+
 ---
 
 <h2 id="النسخة-العربية">النسخة العربية</h2>
