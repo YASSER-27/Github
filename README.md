@@ -1,7 +1,7 @@
 <p align="center">
   <img src="Pack/GitBot.png" width="150" alt="GITFUSION X Logo">
   <h1 align="center">GITFUSION X </h1>
-  <p align="center">The Ultimate Open Source Local AI Workspace</p>
+  <p align="center">Text Generation Img2txt  Txt2Img </p>
 </p>
 <p align="center">
   <a href="https://github.com/YASSER-27/Github/releases">
